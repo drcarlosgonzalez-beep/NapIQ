@@ -1,0 +1,927 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="es"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8"/&gt;</p>
+<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;</p>
+<p class="p1">&lt;title&gt;NapIQ — Medicina del Sueño&lt;/title&gt;</p>
+<p class="p1">&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/&gt;</p>
+<p class="p1">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;script src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>*{box-sizing:border-box;margin:0;padding:0;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f8;color:#1a1a2e;min-height:100vh;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>:root{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-text-primary:#1a1a2e;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-text-secondary:#555577;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-text-tertiary:#999;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-background-primary:#ffffff;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-background-secondary:#f4f4f8;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-border-tertiary:#e0e0ee;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--color-border-secondary:#c8c8dd;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#2d2880 0%,#534AB7 60%,#7b72e8 100%);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>#app-root{max-width:760px;margin:0 auto;padding:16px;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>input,button{font-family:inherit;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>input:focus{outline:2px solid #534AB7;outline-offset:1px;}</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- LOGIN --&gt;</p>
+<p class="p1">&lt;div id="login-screen"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div style="background:#fff;border-radius:16px;padding:40px 36px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,0.18);text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style="width:52px;height:52px;background:#534AB7;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;i class="ti ti-moon" style="color:#fff;font-size:26px;"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;h1 style="font-size:24px;font-weight:600;color:#1a1a2e;margin-bottom:4px;"&gt;NapIQ&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p style="font-size:13px;color:#777;margin-bottom:28px;"&gt;Plataforma clínico-diagnóstica de medicina del sueño&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input id="pwd-input" type="password" placeholder="Contraseña de acceso"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>style="width:100%;padding:11px 14px;font-size:14px;border-radius:10px;border:1.5px solid #e0e0ee;margin-bottom:12px;"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="checkLogin()"</p>
+<p class="p1"><span class="Apple-converted-space">      </span>style="width:100%;padding:11px;font-size:14px;font-weight:600;border-radius:10px;border:none;background:#534AB7;color:#fff;cursor:pointer;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>Entrar</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p id="login-err" style="color:#A32D2D;font-size:12px;margin-top:10px;display:none;"&gt;Contraseña incorrecta.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;!-- APP --&gt;</p>
+<p class="p1">&lt;div id="app-root" style="display:none;"&gt;&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1">function checkLogin(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const val=document.getElementById("pwd-input").value;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const err=document.getElementById("login-err");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(val==="NapIQ2202"){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("login-screen").style.display="none";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("app-root").style.display="block";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(!window.__napiqMounted){window.__napiqMounted=true;mountApp();}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>err.style.display="block";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("pwd-input").value="";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("pwd-input").focus();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">}</p>
+<p class="p1">document.getElementById("pwd-input").addEventListener("keydown",e=&gt;{if(e.key==="Enter")checkLogin();});</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script type="text/babel"&gt;</p>
+<p class="p1">const {useState,useEffect,useRef}=React;</p>
+<p class="p2"><br></p>
+<p class="p1">// ── STORAGE ───────────────────────────────────────────────────────────────────</p>
+<p class="p1">function loadP(){try{const d=localStorage.getItem("napiq_pts");return d?JSON.parse(d):[];}catch{return[];}}</p>
+<p class="p1">function saveP(pts){try{localStorage.setItem("napiq_pts",JSON.stringify(pts));}catch{}}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── PDF HELPERS ───────────────────────────────────────────────────────────────</p>
+<p class="p1">const BRAND="#534AB7",BRAND_LIGHT="#EEEDFE",BRAND_MID="#3C3489";</p>
+<p class="p1">const GREEN="#1D9E75",AMBER="#BA7517",RED="#A32D2D",GRAY="#888780";</p>
+<p class="p1">function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}</p>
+<p class="p1">function pdfSetColor(doc,hex,type="fill"){const[r,g,b]=hexToRgb(hex);type==="fill"?doc.setFillColor(r,g,b):doc.setTextColor(r,g,b);}</p>
+<p class="p1">function pdfHeader(doc,title,sub,name,date){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const W=doc.internal.pageSize.getWidth();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,BRAND,"fill");doc.rect(0,0,W,22,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(16);doc.setFont("helvetica","bold");pdfSetColor(doc,"#ffffff","text");doc.text("NapIQ",14,14);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(9);doc.setFont("helvetica","normal");doc.text("Plataforma clínico-diagnóstica de medicina del sueño",52,10);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.text(`Paciente: ${name} <span class="Apple-converted-space">  </span>| <span class="Apple-converted-space">  </span>Fecha: ${date}`,52,16);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,BRAND_LIGHT,"fill");doc.rect(0,22,W,16,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(13);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(title,14,33);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(sub){doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,BRAND,"text");doc.text(sub,14,39);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return sub?44:40;</p>
+<p class="p1">}</p>
+<p class="p1">function pdfFooter(doc,p,t){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,BRAND,"fill");doc.rect(0,H-10,W,10,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(7);doc.setFont("helvetica","normal");pdfSetColor(doc,"#ffffff","text");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.text("NapIQ — Medicina del sueño basada en evidencia · ICSD-3 TR · DSM-5-TR",14,H-3.5);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.text(`Página ${p} de ${t}`,W-30,H-3.5);</p>
+<p class="p1">}</p>
+<p class="p1">function pdfSectionTitle(doc,text,y){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,BRAND,"fill");doc.rect(14,y,4,6,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(11);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(text,20,y+5);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return y+10;</p>
+<p class="p1">}</p>
+<p class="p1">function pdfWrapped(doc,text,x,y,maxW,fs=10,color="#333333"){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(fs);doc.setFont("helvetica","normal");pdfSetColor(doc,color,"text");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const lines=doc.splitTextToSize(text,maxW);doc.text(lines,x,y);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return y+lines.length*(fs*0.45+1.2)+2;</p>
+<p class="p1">}</p>
+<p class="p1">function pdfScoreBar(doc,name,score,max,color,x,y,bW){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(8);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(name,x,y);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,"#E8E8E8","fill");doc.roundedRect(x,y+2,bW,6,1,1,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const filled=Math.max(3,(score/max)*bW);const[r,g,b]=hexToRgb(color);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFillColor(r,g,b);doc.roundedRect(x,y+2,filled,6,1,1,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(8);doc.setFont("helvetica","bold");pdfSetColor(doc,color,"text");doc.text(`${score}/${max}`,x+bW+3,y+7);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return y+12;</p>
+<p class="p1">}</p>
+<p class="p1">function pdfCircle(doc,score,max,color,cx,cy,r){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,"#E8E8E8","fill");doc.circle(cx,cy,r,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const steps=Math.round((score/max)*36);const[cr,cg,cb]=hexToRgb(color);doc.setFillColor(cr,cg,cb);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>for(let i=0;i&lt;steps;i++){const a1=(i/36)*2*Math.PI-Math.PI/2,a2=((i+1)/36)*2*Math.PI-Math.PI/2;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.triangle(cx,cy,cx+r*Math.cos(a1),cy+r*Math.sin(a1),cx+r*Math.cos(a2),cy+r*Math.sin(a2),"F");}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFillColor(255,255,255);doc.circle(cx,cy,r*0.62,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(10);doc.setFont("helvetica","bold");pdfSetColor(doc,color,"text");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.text(`${score}`,cx-(score&gt;=10?3:1.5),cy+1.5);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(6);doc.setFont("helvetica","normal");pdfSetColor(doc,GRAY,"text");doc.text(`/${max}`,cx+2,cy+4);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">async function generatePatientReportPDF(patient,aiReport){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const JsPDF=window.jspdf.jsPDF;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const doc=new JsPDF({unit:"mm",format:"a4"});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const W=doc.internal.pageSize.getWidth();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const today=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const le={};patient.evaluations?.forEach(e=&gt;{le[e.scaleId]=e;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const scaleInfo={</p>
+<p class="p1"><span class="Apple-converted-space">    </span>psqi:{friendly:"Calidad de tu sueño",labelFn:v=&gt;v&lt;=5?"Tu sueño es de buena calidad":v&lt;=10?"Tu sueño tiene algunas dificultades":"Tu sueño está pasando por un momento difícil",tip:"Este resultado refleja cómo ha sido tu sueño en el último mes, tomando en cuenta qué tan rápido te duermes, si te despiertas en la noche y cómo te sientes al día siguiente."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ess:{friendly:"Somnolencia durante el día",labelFn:v=&gt;v&lt;=10?"Tu nivel de somnolencia es normal":v&lt;=12?"Tienes un poco más de somnolencia de lo usual":v&lt;=17?"Tu somnolencia durante el día es elevada":"Tu somnolencia es muy alta — es importante evaluarla",tip:"Este resultado nos dice qué tanta probabilidad tienes de quedarte dormido/a en situaciones cotidianas. Un resultado alto puede indicar que tu sueño nocturno no está siendo reparador."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>stopbang:{friendly:"Riesgo de apnea del sueño",labelFn:v=&gt;v&lt;=2?"Tu riesgo de apnea del sueño es bajo":v&lt;=4?"Tienes un riesgo intermedio de apnea del sueño":"Tu riesgo de apnea del sueño es alto — se recomienda evaluación",tip:"La apnea del sueño ocurre cuando la respiración se interrumpe brevemente durante el sueño. Este cuestionario ayuda a identificar personas que podrían beneficiarse de un estudio de sueño."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>isi:{friendly:"Severidad de tu insomnio",labelFn:v=&gt;v&lt;=7?"No tienes insomnio clínicamente significativo":v&lt;=14?"Tienes insomnio leve — hay estrategias muy efectivas para manejarlo":v&lt;=21?"Tu insomnio es moderado — el tratamiento puede ayudarte mucho":"Tu insomnio es severo — es importante que recibas tratamiento",tip:"El insomnio es una de las condiciones más tratables en medicina del sueño. La TCC-I tiene una efectividad superior al 80% en la remisión del insomnio crónico."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>irls:{friendly:"Síndrome de piernas inquietas",labelFn:v=&gt;v===0?"No presentas síntomas significativos":v&lt;=10?"Tus síntomas son leves":v&lt;=20?"Tus síntomas son moderados":v&lt;=30?"Tus síntomas son severos":"Tus síntomas son muy severos",tip:"El síndrome de piernas inquietas es una condición neurológica con tratamientos muy efectivos disponibles."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let y=pdfHeader(doc,"Reporte de sueño personalizado","Resumen de tu evaluación y próximos pasos",patient.name,today);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>y+=4;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>y=pdfWrapped(doc,`Hola ${patient.name.split(" ")[0]}, este reporte resume los resultados de tu evaluación de sueño. Está escrito en un lenguaje sencillo para que puedas entender cómo está tu sueño en este momento y qué podemos hacer juntos para mejorarlo.`,14,y,W-28,10,"#333333");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>y+=4;y=pdfSectionTitle(doc,"Tus resultados",y);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const evals=Object.values(le);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(evals.length&gt;0){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cR=10;const cSp=(W-28)/Math.min(evals.length,4);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>evals.slice(0,4).forEach((e,i)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const si=scaleInfo[e.scaleId];if(!si)return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const col=e.risk==="bajo"?GREEN:e.risk==="moderado"?AMBER:RED;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const cx=14+cSp*i+cR+4;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pdfCircle(doc,e.score,e.max,col,cx,y+cR,cR);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.setFontSize(7);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const nm=doc.splitTextToSize(si.friendly,cSp-4);doc.text(nm,cx-(cSp/2-6),y+cR*2+5);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y+=cR*2+16;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>evals.forEach(e=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const si=scaleInfo[e.scaleId];if(!si)return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const col=e.risk==="bajo"?GREEN:e.risk==="moderado"?AMBER:RED;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(y&gt;240){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,"Reporte de sueño personalizado","(continuación)",patient.name,today)+4;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pdfSetColor(doc,"#F9F9FF","fill");doc.roundedRect(14,y,W-28,28,2,2,"F");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const[r,g,b]=hexToRgb(col);doc.setFillColor(r,g,b);doc.roundedRect(14,y,3,28,1,1,"F");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let cy2=pdfScoreBar(doc,si.friendly,e.score,e.max,col,20,y+5,W-60)+2;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.setFontSize(9);doc.setFont("helvetica","bold");pdfSetColor(doc,col,"text");doc.text(si.labelFn(e.score),20,cy2);cy2+=5;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.setFontSize(8);doc.setFont("helvetica","normal");pdfSetColor(doc,"#555555","text");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const tl=doc.splitTextToSize(si.tip,W-36);doc.text(tl,20,cy2);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>y+=28+4;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(aiReport&amp;&amp;aiReport.length&gt;10){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(y&gt;210){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,"Reporte de sueño personalizado","Lo que dice tu médico",patient.name,today)+4;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y=pdfSectionTitle(doc,"Lo que dice tu médico",y);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>pdfSetColor(doc,"#F9F9FF","fill");doc.roundedRect(14,y,W-28,8,"F");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.setFontSize(8);doc.setFont("helvetica","italic");pdfSetColor(doc,BRAND,"text");doc.text("El siguiente resumen fue elaborado por tu especialista en medicina del sueño:",17,y+5);y+=11;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y=pdfWrapped(doc,aiReport,14,y,W-28,9,"#333333");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(y&gt;230){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,"Reporte de sueño personalizado","Próximos pasos",patient.name,today)+4;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>y+=4;y=pdfSectionTitle(doc,"Próximos pasos",y);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>["Acude a tu próxima consulta con este reporte en mano.","Si te recetaron un plan de TCC-I, sigue las instrucciones de cada semana al pie de la letra.","Registra tu sueño cada mañana en tu diario de sueño — es la herramienta más importante del tratamiento.","Si tienes dudas o algo cambia, no esperes a tu próxima cita para comentarlo con tu médico.","Recuerda: el insomnio tiene tratamiento efectivo. Con constancia, los resultados llegan."].forEach((s,i)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>pdfSetColor(doc,BRAND,"fill");doc.circle(17,y-1,2,"F");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.setFontSize(9);pdfSetColor(doc,"#ffffff","text");doc.text(`${i+1}`,16,y);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.setFontSize(9);pdfSetColor(doc,"#333333","text");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const ls=doc.splitTextToSize(s,W-34);doc.text(ls,21,y);y+=ls.length*5+3;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const tp=doc.internal.pages.length-1;for(let p=1;p&lt;=tp;p++){doc.setPage(p);pdfFooter(doc,p,tp);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.save(`NapIQ_Reporte_${patient.name.replace(/ /g,"_")}_${new Date().toISOString().slice(0,10)}.pdf`);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">async function generateSessionPDF(patient,session){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const JsPDF=window.jspdf.jsPDF;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const doc=new JsPDF({unit:"mm",format:"a4"});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const W=doc.internal.pageSize.getWidth();</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const today=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const titles={1:"Semana 1 — Entendiendo tu sueño",2:"Semana 2 — Regulando tu tiempo de sueño",3:"Semana 3 — Reconectando la cama con el sueño",4:"Semana 4 — Cambiando la forma en que piensas sobre el sueño",5:"Semana 5 — Desafiando los pensamientos difíciles",6:"Semana 6 — Aprendiendo a soltar la lucha",7:"Semana 7 — Consolidando tus avances",8:"Semana 8 — Manteniendo lo que lograste"};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const intros={1:`Hola ${patient.name.split(" ")[0]}! Esta semana comenzamos juntos un camino para mejorar tu sueño. No se trata de hacer grandes cambios de un día para otro — se trata de entender cómo funciona tu sueño y empezar a observarlo con curiosidad, sin juicio.`,2:`¡Bienvenido/a a tu segunda semana! Esta semana ajustaremos el tiempo que pasas en cama. Puede sonar extraño, pero pasar MENOS tiempo en cama al principio es lo que hará que tu sueño se vuelva más profundo y continuo. ¡Confía en el proceso!`,3:`¡Vas muy bien! Esta semana añadimos una herramienta fundamental: aprender a usar la cama SOLO para dormir. Tu cerebro ha aprendido a asociar la cama con estar despierto/a y preocupado/a — esta semana empezamos a cambiar eso.`,4:`Esta semana llegamos al corazón del tratamiento: lo que piensas sobre el sueño. Los pensamientos negativos sobre el insomnio lo mantienen vivo. Esta semana empezarás a identificarlos — ¡sin juzgarte!`,5:`Esta semana aprenderás a cuestionar esos pensamientos difíciles y reemplazarlos por otros más útiles. No se trata de "pensar positivo" — se trata de pensar con más precisión y compasión hacia ti mismo/a.`,6:`Esta semana exploramos una forma diferente de relacionarte con el insomnio: en lugar de luchar contra él, aprender a observarlo y aceptarlo. Esto no significa resignarse — significa quitarle el poder que tiene sobre ti.`,7:`¡Estás en la recta final! Esta semana revisamos todo lo que has aprendido y construimos tu plan personal para mantener los avances.`,8:`¡Lo lograste! Esta sesión es tu revisión de mantenimiento. Vamos a ver cómo estás y asegurarnos de que tienes todo para seguir durmiendo bien.`};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const motivations={1:"¡Un paso a la vez! Observar tu sueño esta semana es todo lo que necesitas hacer.",2:"La somnolencia la primera semana es normal — es señal de que el tratamiento está funcionando.",3:"Recuerda: levantarte de la cama cuando no puedes dormir no es rendirse — es la clave para mejorar.",4:"Identificar un pensamiento difícil ya es un gran avance. No te juzgues — solo observa.",5:"No se trata de pensar positivo, sino de pensar con más precisión. ¡Tú puedes!",6:"Soltar la lucha no es rendirse — es la forma más inteligente de ganar.",7:"Ya tienes las herramientas. Ahora es momento de confiar en ti mismo/a.",8:"¡Felicidades por llegar hasta aquí! Tu compromiso con mejorar tu sueño es admirable."};</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const ft=titles[session.n]||`Semana ${session.n}`;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let y=pdfHeader(doc,ft,`Plan semanal para ${patient.name.split(" ")[0]}`,patient.name,today);y+=4;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,BRAND_LIGHT,"fill");doc.roundedRect(14,y,W-28,24,2,2,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(10);doc.setFont("helvetica","normal");pdfSetColor(doc,BRAND_MID,"text");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const il=doc.splitTextToSize(intros[session.n]||`Esta semana trabajaremos en: ${session.focus}`,W-34);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.text(il,18,y+7);y+=Math.max(26,il.length*5+8);y+=4;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(session.content?.length&gt;0){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y=pdfSectionTitle(doc,"Tus instrucciones para esta semana",y);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const fh={"Modelo 3P de Spielman":"¿Por qué te quedas sin dormir? El ciclo del insomnio","Cómo usar el Diario de Sueño":"Tu diario de sueño — cómo llenarlo cada mañana","Cómo calcular la ventana de sueño inicial":"Tu horario de sueño personalizado","Protocolo de titulación semanal":"Cómo ajustamos tu horario semana a semana","Las 5 reglas de control de estímulos (Bootzin, 1972)":"Tus 5 reglas para esta semana","Manejo de resistencias comunes":"Respuestas a tus posibles dudas","Modelo cognitivo del insomnio (Harvey, 2002)":"¿Cómo los pensamientos mantienen el insomnio?","Técnica: Registro de 3 columnas":"Tu ejercicio de la semana","Cuestionamiento socrático — 5 preguntas clave":"Las 5 preguntas para cuestionar tus pensamientos","Paradoja del control del sueño":"¿Por qué esforzarte por dormir lo empeora?","Diferencia conceptual: control vs aceptación":"Una nueva forma de ver el insomnio","Defusión cognitiva":"Observar tus pensamientos desde lejos","Mindfulness pre-sueño (5-10 min)":"Tu práctica de mindfulness esta semana","Revisión de progreso":"Revisando cuánto has avanzado","Plan personal de mantenimiento":"Tu plan personal para seguir durmiendo bien","Evaluación de mantenimiento":"Cómo está tu sueño ahora"};</p>
+<p class="p1"><span class="Apple-converted-space">    </span>session.content.forEach((c,ci)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(y&gt;240){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"(continuación)",patient.name,today)+8;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.setFontSize(10);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.text(`${ci+1}. ${fh[c.heading]||c.heading}`,14,y);y+=6;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const fb=c.body.replace(/TTS/g,"horas dormidas").replace(/\bTEC\b/g,"tiempo en cama").replace(/\bES\b/g,"eficiencia del sueño").replace(/WASO/g,"tiempo despierto en la noche").replace(/hiperarousal/g,"estado de alerta elevada").replace(/iOR[\s\d.]+/g,"").replace(/IC 95%[^)]+\)/g,"").replace(/Furukawa[^.]+\./g,"").replace(/Harvey[^.]+\./g,"").replace(/Bootzin[^,]+,/g,"").replace(/Borbely[^.]+\./g,"").trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bl=doc.splitTextToSize(fb,W-28);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,"#333333","text");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let li=0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>while(li&lt;bl.length){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(y&gt;255){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"(continuación)",patient.name,today)+8;}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const chunk=bl.slice(li,li+12);doc.text(chunk,14,y);y+=chunk.length*4.5;li+=12;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>y+=4;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(session.tarea){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(y&gt;230){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"Tu tarea",patient.name,today)+8;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y+=2;pdfSetColor(doc,BRAND,"fill");doc.roundedRect(14,y,W-28,8,2,2,"F");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.setFontSize(10);doc.setFont("helvetica","bold");pdfSetColor(doc,"#ffffff","text");doc.text("Tu tarea de esta semana",17,y+5.5);y+=10;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>pdfSetColor(doc,BRAND_LIGHT,"fill");doc.roundedRect(14,y,W-28,30,2,2,"F");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,BRAND_MID,"text");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const tl=doc.splitTextToSize(session.tarea.replace(/TTS/g,"horas dormidas").replace(/\bTEC\b/g,"tiempo en cama").replace(/\bES\b/g,"eficiencia del sueño"),W-32);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.text(tl,17,y+6);y+=Math.max(32,tl.length*4.5+8);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Diario for sessions 1-2</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(session.n&lt;=2){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if(y&gt;180){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"Diario de sueño",patient.name,today)+8;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y+=4;y=pdfSectionTitle(doc,"Tu diario de sueño — esta semana",y);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const days=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const headers=["Día","Acosté","Tardé","Despertares","T.Despierto","Levanté","Hrs dormidas","Calidad 0-10"];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cW=(W-28)/headers.length;const rH=8;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>pdfSetColor(doc,BRAND,"fill");doc.rect(14,y,W-28,rH,"F");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>headers.forEach((h,i)=&gt;{doc.setFontSize(6);doc.setFont("helvetica","bold");pdfSetColor(doc,"#ffffff","text");doc.text(h,14+i*cW+1,y+5);});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>y+=rH;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>days.forEach((d,i)=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>pdfSetColor(doc,i%2===0?"#F5F5FF":BRAND_LIGHT,"fill");doc.rect(14,y,W-28,rH,"F");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>doc.setFontSize(8);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(d,15,y+5.5);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>for(let c=1;c&lt;headers.length;c++){doc.setFontSize(7);pdfSetColor(doc,"#CCCCCC","text");doc.text("___",14+c*cW+1,y+5.5);}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>y+=rH;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});y+=4;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.setFontSize(7);doc.setFont("helvetica","italic");pdfSetColor(doc,GRAY,"text");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>doc.text("Llena este diario cada mañana al despertar, recordando la noche anterior. No lo llenes durante la noche.",14,y);y+=6;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(y&gt;240){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=20;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>y+=4;pdfSetColor(doc,"#F0FFF8","fill");doc.roundedRect(14,y,W-28,16,2,2,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>pdfSetColor(doc,GREEN,"fill");doc.roundedRect(14,y,3,16,1,1,"F");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(9);doc.setFont("helvetica","bold");pdfSetColor(doc,GREEN,"text");doc.text("Recuerda esta semana:",20,y+6);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,"#1A5C44","text");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const ml=doc.splitTextToSize(motivations[session.n]||"¡Sigue adelante!",W-34);doc.text(ml,20,y+11);y+=18;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const tp=doc.internal.pages.length-1;for(let p=1;p&lt;=tp;p++){doc.setPage(p);pdfFooter(doc,p,tp);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>doc.save(`NapIQ_Semana${session.n}_${patient.name.replace(/ /g,"_")}.pdf`);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── PSQI ──────────────────────────────────────────────────────────────────────</p>
+<p class="p1">const PSQI_ITEMS=[</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q1",text:"¿A qué hora acostumbra acostarse por la noche?",type:"time",comp:null,placeholder:"Ej: 22:30"},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q2",text:"¿Cuántos minutos tarda habitualmente en quedarse dormido/a después de acostarse?",type:"number",comp:2,placeholder:"Minutos"},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q3",text:"¿A qué hora acostumbra levantarse por la mañana?",type:"time",comp:null,placeholder:"Ej: 06:30"},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q4",text:"En el último mes, ¿cuántas horas de sueño real durmió por noche?",type:"number",comp:3,placeholder:"Horas (ej: 6.5)"},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q5a",text:"No pudo dormir en 30 minutos",type:"freq",comp:5},{id:"q5b",text:"Se despertó en medio de la noche o madrugada",type:"freq",comp:5},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q5c",text:"Tuvo que levantarse para ir al baño",type:"freq",comp:5},{id:"q5d",text:"No pudo respirar bien",type:"freq",comp:5},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q5e",text:"Tosió o roncó fuerte",type:"freq",comp:5},{id:"q5f",text:"Sintió mucho frío",type:"freq",comp:5},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q5g",text:"Sintió mucho calor",type:"freq",comp:5},{id:"q5h",text:"Tuvo pesadillas",type:"freq",comp:5},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q5i",text:"Tuvo dolor",type:"freq",comp:5},{id:"q5j",text:"Otro problema para dormir",type:"freq",comp:5},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q6",text:"En el último mes, ¿cómo calificaría la calidad general de su sueño?",type:"select",comp:1,options:["Muy buena (0)","Bastante buena (1)","Bastante mala (2)","Muy mala (3)"],optValues:[0,1,2,3]},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q7",text:"¿Con qué frecuencia tomó medicamentos para dormir?",type:"freq",comp:6},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q8",text:"¿Con qué frecuencia tuvo dificultades para mantenerse despierto/a mientras conducía, comía o en actividades sociales?",type:"freq",comp:7},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"q9",text:"¿Cuánto problema representó para usted mantener el ánimo para realizar sus actividades?",type:"select",comp:7,options:["Ningún problema (0)","Solo un leve problema (1)","Algo de problema (2)","Un gran problema (3)"],optValues:[0,1,2,3]},</p>
+<p class="p1">];</p>
+<p class="p1">const FREQ_OPTS=["Ninguna vez (0)","Menos de 1 vez/sem (1)","1-2 veces/sem (2)","3 o más veces/sem (3)"];</p>
+<p class="p1">const FREQ_VALS=[0,1,2,3];</p>
+<p class="p1">function calcPSQI(ans){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const c1=ans["q6"]??null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let c2=null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(ans["q2"]!==undefined&amp;&amp;ans["q5a"]!==undefined){const lat=Number(ans["q2"]);const ls=lat&lt;=15?0:lat&lt;=30?1:lat&lt;=60?2:3;const raw=ls+(ans["q5a"]||0);c2=raw===0?0:raw&lt;=2?1:raw&lt;=4?2:3;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let c3=null;if(ans["q4"]!==undefined){const h=Number(ans["q4"]);c3=h&gt;=7?0:h&gt;=6?1:h&gt;=5?2:3;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let c4=null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(ans["q1"]&amp;&amp;ans["q3"]&amp;&amp;ans["q4"]!==undefined){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const[bh,bm]=ans["q1"].split(":").map(Number);const[uh,um]=ans["q3"].split(":").map(Number);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let bedMin=bh*60+bm,upMin=uh*60+um;if(upMin&lt;=bedMin)upMin+=1440;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const tec=(upMin-bedMin)/60;const eff=tec&gt;0?(Number(ans["q4"])/tec)*100:0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>c4=eff&gt;=85?0:eff&gt;=75?1:eff&gt;=65?2:3;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let c5=null;const pk=["q5b","q5c","q5d","q5e","q5f","q5g","q5h","q5i","q5j"];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const pv=pk.map(k=&gt;ans[k]).filter(v=&gt;v!==undefined);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(pv.length===pk.length){const sum=pv.reduce((s,v)=&gt;s+v,0);c5=sum===0?0:sum&lt;=9?1:sum&lt;=18?2:3;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const c6=ans["q7"]??null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>let c7=null;if(ans["q8"]!==undefined&amp;&amp;ans["q9"]!==undefined){const raw=(ans["q8"]||0)+(ans["q9"]||0);c7=raw===0?0:raw&lt;=2?1:raw&lt;=4?2:3;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const comps=[c1,c2,c3,c4,c5,c6,c7];</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const total=comps.every(c=&gt;c!==null)?comps.reduce((s,c)=&gt;s+c,0):null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return{c1,c2,c3,c4,c5,c6,c7,total};</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── SCALES ────────────────────────────────────────────────────────────────────</p>
+<p class="p1">const SCALES={</p>
+<p class="p1"><span class="Apple-converted-space">  </span>psqi:{id:"psqi",name:"Índice de Calidad de Sueño de Pittsburgh (PSQI)",desc:"Evalúa la calidad subjetiva del sueño en el último mes. Versión completa de 19 ítems.",questions:[],options:[],optionValues:[],max:21,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>interpret:v=&gt;v&lt;=5?{label:"Buena calidad de sueño",color:GREEN,risk:"bajo",detail:"Puntaje ≤5: buena calidad de sueño (sens. 89.6%, esp. 86.5%). Buysse 1989; Mollayeva et al. 2016."}:v&lt;=10?{label:"Mala calidad de sueño",color:AMBER,risk:"moderado",detail:"Puntaje &gt;5: mala calidad de sueño. Evaluación clínica recomendada. Mollayeva et al. Sleep Med Rev. 2016."}:{label:"Muy mala calidad / trastorno probable",color:RED,risk:"alto",detail:"Puntaje &gt;10 asociado a trastorno del sueño clínicamente significativo. Considerar PSG y TCC-I."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ref:"Buysse DJ et al. Psychiatry Res. 1989 | Mollayeva T et al. Sleep Med Rev. 2016;25:52-73."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>ess:{id:"ess",name:"Escala de Somnolencia de Epworth (ESS)",desc:"Evalúa la probabilidad de quedarse dormido en 8 situaciones cotidianas.",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>questions:["Sentado/a leyendo","Viendo televisión","Sentado/a en un lugar público","Como pasajero/a en un auto durante 1 hora","Acostado/a a descansar en la tarde","Sentado/a hablando con alguien","Sentado/a tranquilamente después de comer","En un auto, detenido/a por tráfico unos minutos"],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options:["Nunca me dormiría (0)","Poca probabilidad (1)","Probabilidad moderada (2)","Alta probabilidad (3)"],optionValues:[0,1,2,3],max:24,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>interpret:v=&gt;v&lt;=10?{label:"Normal",color:GREEN,risk:"bajo",detail:"Puntaje ≤10: sin somnolencia clínica significativa (esp. 93%). Kendzerska et al. 2014."}:v&lt;=12?{label:"Somnolencia leve",color:AMBER,risk:"leve",detail:"Zona limítrofe. Algunos estudios sugieren ≥11 como punto de corte más sensible. Chiu et al. 2016."}:v&lt;=17?{label:"Somnolencia moderada",color:"#E24B4A",risk:"moderado",detail:"SDE moderada. Correlaciona con deterioro funcional y AOS. Evaluación clínica indicada."}:{label:"Somnolencia severa",color:RED,risk:"alto",detail:"Puntaje &gt;17: mayor riesgo de accidentes, AOS severa y narcolepsia. Evaluación urgente. Sutton 2021."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ref:"Johns MW. Sleep. 1991 | Kendzerska TB et al. Sleep Med Rev. 2014 | Sutton EL. Med Clin North Am. 2021."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>stopbang:{id:"stopbang",name:"Cuestionario STOP-Bang",desc:"Tamizaje de Apnea Obstructiva del Sueño.",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>questions:["S — ¿Ronca fuerte (escuchable a través de una puerta cerrada)?","T — ¿Se siente frecuentemente cansado/a, fatigado/a o somnoliento/a durante el día?","O — ¿Alguien ha observado que deja de respirar o se ahoga mientras duerme?","P — ¿Tiene o recibe tratamiento para presión alta (hipertensión)?","B — ¿Su índice de masa corporal (IMC) es mayor de 35 kg/m²?","A — ¿Tiene usted más de 50 años?","N — ¿Su circunferencia de cuello es mayor de 40 cm?","G — ¿Es usted del sexo masculino?"],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options:["No (0)","Sí (1)"],optionValues:[0,1],max:8,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>interpret:v=&gt;v&lt;=2?{label:"Riesgo bajo de AOS",color:GREEN,risk:"bajo",detail:"Sens. 83.6% para AOS moderada-severa con puntaje ≤2. VPN 95.7% para AOS severa. Nagappa et al. 2015."}:v&lt;=4?{label:"Riesgo intermedio de AOS",color:AMBER,risk:"moderado",detail:"Probabilidad ~40-60% para AOS moderada-severa. Considerar poligrafía. Chung et al. 2016."}:{label:"Riesgo alto de AOS",color:RED,risk:"alto",detail:"Sens. 93.4% para AOS severa (IAH≥30). Poligrafía o PSG indicada. Nagappa et al. PLoS ONE. 2015."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ref:"Chung F et al. Anesthesiology. 2008 | Nagappa M et al. PLoS ONE. 2015 | Chung F et al. JCSM. 2016."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>isi:{id:"isi",name:"Índice de Severidad del Insomnio (ISI)",desc:"Evalúe sus problemas de sueño en las ÚLTIMAS 2 SEMANAS.",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>questions:["Dificultad para QUEDARSE dormido/a","Dificultad para MANTENERSE dormido/a","Problema de DESPERTAR muy temprano","¿Qué tan SATISFECHO/A está con su sueño ACTUAL? (0=muy satisfecho, 4=muy insatisfecho)","¿En qué medida su problema de sueño INTERFIERE con su funcionamiento diario?","¿En qué medida su problema de sueño es PERCEPTIBLE para personas de su entorno?","¿Qué tan PREOCUPADO/A está por su problema de sueño actual?"],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options:["0 — Ninguno/a","1 — Leve","2 — Moderado/a","3 — Severo/a","4 — Muy severo/a"],optionValues:[0,1,2,3,4],max:28,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>interpret:v=&gt;v&lt;=7?{label:"Sin insomnio clínicamente significativo",color:GREEN,risk:"bajo",detail:"Puntaje ≤7: ausencia de insomnio clínico. Esp. 94.9%. Morin et al. Sleep. 2011."}:v&lt;=14?{label:"Insomnio subclínico",color:AMBER,risk:"leve",detail:"Sens. 82.4%, esp. 82.1%. Intervención temprana con TCC-I puede prevenir cronificación. Morin 2022."}:v&lt;=21?{label:"Insomnio clínico moderado — TCC-I indicada",color:"#E24B4A",risk:"moderado",detail:"Puntaje ≥15: sens. 97.9% para insomnio crónico severo. TCC-I primera línea. Furukawa 2024."}:{label:"Insomnio clínico severo",color:RED,risk:"alto",detail:"Insomnio severo. TCC-I intensiva + evaluación de comorbilidades urgente. Riemann et al. 2023."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ref:"Bastien CH et al. Sleep. 2001 | Morin CM et al. Sleep. 2011 | Riemann D et al. J Sleep Res. 2023."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>irls:{id:"irls",name:"Escala Internacional de Gravedad del SPI (IRLS)",desc:"Evalúe sus síntomas de Síndrome de Piernas Inquietas en la ÚLTIMA SEMANA.",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>questions:["Intensidad de molestias en piernas/brazos (0=ninguna, 4=muy intensa)","Necesidad de moverse (0=ninguna, 4=muy intensa)","Alivio con el movimiento (0=alivio completo, 4=ningún alivio)","Perturbación del sueño (0=ninguna, 4=muy grave)","Cansancio/somnolencia diurna (0=nada, 4=muy cansado)","Gravedad general del SPI (0=ninguna, 4=muy grave)","Frecuencia de síntomas (0=nunca, 4=6-7 días/sem)","Frecuencia de afectación del sueño (0=nunca, 4=6-7 días/sem)","Interferencia con actividades diarias (0=nada, 4=mucho)","Angustia/irritación por el SPI (0=nada, 4=muy angustiado)"],</p>
+<p class="p1"><span class="Apple-converted-space">    </span>options:["0","1","2","3","4"],optionValues:[0,1,2,3,4],max:40,</p>
+<p class="p1"><span class="Apple-converted-space">    </span>interpret:v=&gt;v===0?{label:"Sin SPI",color:GREEN,risk:"bajo",detail:"Sin síntomas de SPI."}:v&lt;=10?{label:"SPI leve",color:GREEN,risk:"leve",detail:"SPI leve. Medidas no farmacológicas. Evaluar ferritina (meta &gt;75 ng/mL). Allen et al. 2018."}:v&lt;=20?{label:"SPI moderado",color:AMBER,risk:"moderado",detail:"Considerar tratamiento farmacológico. Primera línea: agonistas dopaminérgicos o ligandos α2δ. García-Borreguero 2016."}:v&lt;=30?{label:"SPI severo",color:"#E24B4A",risk:"alto",detail:"Tratamiento farmacológico indicado. Evaluar riesgo de augmentación. Silber et al. Mayo Clin Proc. 2021."}:{label:"SPI muy severo",color:RED,risk:"alto",detail:"SPI muy severo. Referencia a especialista. Silber MH et al. Mayo Clin Proc. 2021."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ref:"Allen RP et al. Sleep Med. 2003 | García-Borreguero D et al. Sleep Med. 2016 | Silber MH et al. Mayo Clin Proc. 2021."}</p>
+<p class="p1">};</p>
+<p class="p2"><br></p>
+<p class="p1">// ── TCC-I SESSIONS ────────────────────────────────────────────────────────────</p>
+<p class="p1">function buildSessions(isi,psqi){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const n=isi&gt;=22?8:isi&gt;=15?7:6;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return[</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{n:1,title:"Evaluación inicial y modelo 3P",focus:"Psicoeducación · Modelo 3P · Diario de sueño",evidenceLevel:"control",evidence:"Marco educativo — base para componentes activos",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Modelo 3P de Spielman",body:`El insomnio crónico se explica mediante 3 tipos de factores:\n\n▸ PREDISPONENTES — Vulnerabilidad biológica o psicológica preexistente. Ejemplos: tendencia a la ansiedad, hiperarousal del sistema nervioso autónomo, historia familiar de insomnio, rasgos perfeccionistas.\n\n▸ PRECIPITANTES — Estresores que detonaron el insomnio. Ejemplos: duelo, enfermedad, cambio laboral, ruptura de pareja. Generalmente el insomnio comienza siendo adaptativo.\n\n▸ PERPETUANTES — Conductas y pensamientos que MANTIENEN el insomnio aunque el estresor original haya desaparecido. Estos son el objetivo principal de la TCC-I. Ejemplos: pasar más tiempo en cama, siestas compensatorias, revisar el celular si no duerme, cafeína para compensar el cansancio.\n\nTarea del clínico: identificar con el paciente sus factores 3P específicos y crear un mapa personalizado.`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Cómo usar el Diario de Sueño",body:`El diario de sueño es la herramienta de automonitoreo fundamental de la TCC-I. Se llena cada MAÑANA, al despertar.\n\nQUÉ REGISTRAR CADA DÍA:\n• Hora en que se metió a la cama (HC)\n• Hora en que intentó dormir (HI)\n• Tiempo que tardó en dormirse / latencia de sueño (LS) en minutos\n• Número de veces que se despertó en la noche\n• Tiempo total despierto en la noche (WASO) en minutos\n• Hora de despertar final (HD)\n• Hora en que se levantó de la cama (HL)\n• Calidad subjetiva del sueño (0-10)\n• Notas: alcohol, medicamentos, estrés, ejercicio\n\nCÁLCULOS:\n• Tiempo en Cama (TEC) = HL − HC\n• Tiempo Total de Sueño (TTS) = TEC − LS − WASO\n• Eficiencia del Sueño (ES) = TTS ÷ TEC × 100%`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Completar el diario de sueño cada mañana durante 7 días. No intentar dormir 'mejor' esta semana — el objetivo es solo registrar.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"La higiene del sueño como componente aislado no tiene beneficio incremental (iOR 1.01, Furukawa 2024). Se introduce aquí como contexto educativo, no como intervención activa."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{n:2,title:"Restricción del sueño",focus:"Restricción del sueño — iOR 1.49",evidenceLevel:"beneficio",evidence:"iOR 1.49 (IC 95% 1.04-2.13) — mejora eficiencia del sueño y WASO (Furukawa et al. JAMA Psychiatry 2024)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Cómo calcular la ventana de sueño inicial",body:`Con los 7 días del diario de sueño:\n\n1. Calcular TTS PROMEDIO: suma de los 7 TTS ÷ 7\n2. VENTANA DE SUEÑO = TTS promedio + 30 min (mínimo 5.5 horas)\n3. FIJAR hora de LEVANTADA: inamovible, todos los días incluyendo fines de semana\n4. Calcular hora de ACOSTARSE: HC = Hora de levantada − Ventana de sueño\n\nEjemplo: TTS promedio = 5.2h → Ventana = 5.7h → Levantada 06:30 → Acostarse a las 00:48\n\n5. El paciente NO debe acostarse antes de la hora prescrita, aunque tenga sueño.`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Protocolo de titulación semanal",body:`Cada semana se revisa la Eficiencia del Sueño (ES) promedio:\n\n• ES ≥ 90%: AUMENTAR ventana en 15-20 min (acostarse 15 min antes)\n• ES 85-89%: MANTENER la ventana sin cambios\n• ES &lt; 85%: REDUCIR la ventana en 15 min (acostarse 15 min más tarde)\n\nLa somnolencia diurna intensa la primera semana es ESPERADA — es señal de que el tratamiento está funcionando (presión homeostática del sueño aumentando).`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Aplicar la ventana de sueño prescrita con hora de levantada fija. Continuar el diario de sueño. Anotar ES diaria.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"Componente con mayor impacto en eficiencia del sueño y WASO. Mecanismo: aumenta la presión homeostática (proceso S de Borbely), consolida el sueño y reduce la fragmentación."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{n:3,title:"Control de estímulos",focus:"Control de estímulos — iOR 1.43",evidenceLevel:"beneficio",evidence:"iOR 1.43 (IC 95% 1.00-2.05) — mejora latencia de sueño y eficiencia (Furukawa et al. 2024)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Las 5 reglas de control de estímulos (Bootzin, 1972)",body:`1. IR A LA CAMA SOLO CUANDO TENGA SUEÑO — no solo cuando esté cansado/a. El sueño somnoliento (ojos pesados, cabeza que cae) es diferente al cansancio físico.\n\n2. USAR LA CAMA ÚNICAMENTE PARA DORMIR Y SEXO — no ver televisión, no usar el teléfono, no leer, no comer, no trabajar.\n\n3. LA REGLA DE LOS 20 MINUTOS — Si después de ~20 minutos no se ha dormido, LEVANTARSE de la cama e ir a otra habitación. Realizar una actividad tranquila con luz tenue. Volver a la cama SOLO cuando sienta soñolencia real.\n\n4. REPETIR LA REGLA CUANTAS VECES SEA NECESARIO durante la misma noche.\n\n5. LEVANTARSE A LA MISMA HORA TODOS LOS DÍAS — incluyendo fines de semana.`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Manejo de resistencias comunes",body:`"No puedo dormirme si me levanto" — Normalizar: al principio cuesta. Con la práctica, el reconocimiento del sueño somnoliento mejora.\n\n"¿Y si tengo frío / es de madrugada?" — Preparar ropa cómoda y lugar designado con manta. Tener actividades predefinidas.\n\n"¿No será peor madrugar levantándome?" — Mientras más tiempo se pasa en cama sin dormir, más se refuerza el condicionamiento negativo cama-vigilia.`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Aplicar las 5 reglas sin excepciones. Anotar en el diario cuántas veces aplicó la regla de los 20 min.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"El control de estímulos mejora la latencia de sueño (iMD −7 min, IC 95% −11 a −3) y la eficiencia. Forma el núcleo conductual junto con la restricción del sueño."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{n:4,title:"Reestructuración cognitiva I — Identificación",focus:"Reestructuración cognitiva — iOR 1.68",evidenceLevel:"beneficio",evidence:"iOR 1.68 (IC 95% 1.28-2.20) — mayor beneficio en remisión de todos los componentes evaluados (Furukawa et al. 2024)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Modelo cognitivo del insomnio (Harvey, 2002)",body:`El ciclo que mantiene el insomnio:\n1. PREOCUPACIÓN excesiva sobre el sueño al acostarse\n2. ATENCIÓN SELECTIVA: el cerebro "busca" señales de que algo está mal\n3. PERCEPCIÓN DISTORSIONADA: sobreestima el tiempo despierto, subestima el dormido\n4. CONDUCTAS DE SEGURIDAD: intentos de controlar el sueño que lo empeoran\n5. CONSECUENCIAS DIURNAS que refuerzan el ciclo`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Técnica: Registro de 3 columnas",body:`SITUACIÓN: "Son las 2 AM y llevo 45 min despierto/a"\nPENSAMIENTO AUTOMÁTICO: "Mañana será horrible, no voy a poder funcionar"\nEMOCIÓN + INTENSIDAD: Angustia 8/10, Frustración 7/10\n\nCreencias disfuncionales frecuentes:\n• "Necesito exactamente 8 horas para funcionar"\n• "He perdido para siempre la capacidad de dormir bien"\n• "Si no duermo esta noche, el día de mañana será un desastre"\n• "Debo controlar mi sueño o algo malo me pasará"\n• "Mi cuerpo no sabe cómo dormir"`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Registro de 3 columnas: identificar al menos 2 pensamientos disfuncionales sobre el sueño esta semana.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"La reestructuración cognitiva tuvo el mayor iOR entre todos los componentes (1.68). Efecto principal: calidad subjetiva del sueño y remisión a largo plazo."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{n:5,title:"Reestructuración cognitiva II — Cuestionamiento",focus:"Reestructuración cognitiva — iOR 1.68",evidenceLevel:"beneficio",evidence:"iOR 1.68 (IC 95% 1.28-2.20)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Cuestionamiento socrático — 5 preguntas clave",body:`1. ¿Qué EVIDENCIA tengo de que este pensamiento es verdad?\n <span class="Apple-converted-space">  </span>"¿Hay días que duermo mal y aun así funciono?" → "Sí, a veces."\n\n2. ¿Hay otra forma de VER esta situación?\n <span class="Apple-converted-space">  </span>"¿Podría ser que mi cuerpo está en proceso de ajuste?"\n\n3. ¿Qué le diría a un AMIGO/A que pensara esto?\n <span class="Apple-converted-space">  </span>"Le diría que exagera, que el cuerpo tiene recursos."\n\n4. ¿Cuál es el PEOR ESCENARIO real?\n <span class="Apple-converted-space">  </span>"Estaré cansado/a mañana" — ¿Es catastrófico? ¿Ya lo sobreviví antes?\n\n5. ¿Cómo me PERJUDICA pensar esto?\n <span class="Apple-converted-space">  </span>"Pensar en el desastre genera más ansiedad y menos sueño."`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Paradoja del control del sueño",body:`El sueño empeora con el esfuerzo consciente de controlarlo — como la digestión o la respiración automática.\n\nEl "esfuerzo de dormir" activa el sistema nervioso simpático, exactamente lo contrario de lo necesario.\n\nMensaje terapéutico clave: el objetivo no es dormir perfectamente, sino RELACIONARSE DIFERENTE con el sueño. "Dormir suficientemente bien" es el nuevo estándar.`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Completar 5 columnas (añadir pensamiento alternativo + resultado al día siguiente). Verificar si las predicciones catastrofistas se cumplieron.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"La combinación de reestructuración cognitiva + tercera ola tiene el mayor efecto sobre calidad subjetiva del sueño."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>{n:6,title:"Tercera ola — Mindfulness y ACT",focus:"Componentes de tercera ola — iOR 1.49",evidenceLevel:"beneficio",evidence:"iOR 1.49 (IC 95% 1.10-2.03) — mejora calidad subjetiva del sueño y remisión (Furukawa et al. 2024)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Diferencia conceptual: control vs aceptación",body:`TCC clásica: identifica y CAMBIA pensamientos disfuncionales.\nTercera ola (Mindfulness/ACT): aprende a RELACIONARSE DIFERENTE con los pensamientos — no cambiarlos, sino no dejarse arrastrar por ellos.\n\nMensaje central de ACT para insomnio:\n"El problema no es NO dormir — el problema es la LUCHA contra no dormir. El sufrimiento = Dolor × Resistencia."`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Defusión cognitiva",body:`En lugar de "Mañana estaré fatal" → "Estoy teniendo el pensamiento de que mañana estaré fatal"\n• Visualizar el pensamiento como una hoja que flota en un río\n• Técnica del "radio de fondo": los pensamientos son como una radio — puedes escucharlos sin que controlen lo que haces`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Mindfulness pre-sueño (5-10 min)",body:`IMPORTANTE: la práctica NO se hace EN cama. Se hace sentado/a en una silla cómoda, 30-60 min antes de la hora de acostarse.\n\nEjercicio básico de escaneo corporal:\n1. Sentado/a con ojos cerrados, respiración natural\n2. Llevar la atención a los pies — sensaciones: frío, calor, presión\n3. Subir lentamente: tobillos, piernas, abdomen, pecho, hombros, cuello, cabeza\n4. Cuando aparezca un pensamiento, note: "pensamiento" y regrese al cuerpo\n5. No hay objetivo de relajarse — solo observar\n\nPreocupación constructiva: 30 min antes de acostarse, anotar 3 preocupaciones + una acción posible para cada una. Luego cerrar el cuaderno.`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Práctica de mindfulness 5-10 min diarios (fuera de cama). Lista de preocupación constructiva si aplica. Continuar diario de sueño.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"El ligero aumento en dropout asociado a tercera ola (iOR 1.46) se reduce con psicoeducación previa clara sobre el concepto de aceptación."},</p>
+<p class="p1"><span class="Apple-converted-space">    </span>...(n&gt;=7?[{n:7,title:"Consolidación y prevención de recaídas",focus:"Mantenimiento de ganancias",evidenceLevel:"mantenimiento",evidence:"Reestructuración cognitiva asociada a remisión a largo plazo (iOR 1.59, Furukawa 2024)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Revisión de progreso",body:`Reaplicar ISI y PSQI. Comparar con valores basales.\n\nCriterios de respuesta:\n• REMISIÓN: ISI &lt; 8\n• RESPUESTA: reducción ≥8 puntos en ISI\n• RESPUESTA PARCIAL: reducción 4-7 puntos en ISI\n\nSi no hay respuesta: revisar adherencia a restricción del sueño y control de estímulos.`},</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Plan personal de mantenimiento",body:`El paciente elabora su plan escrito con:\n\n3 REGLAS NO NEGOCIABLES (las que más le funcionaron).\n\n2 SEÑALES DE ALERTA TEMPRANA personales.\n\n3 HERRAMIENTAS DE PRIMERA RESPUESTA ante recaída.\n\nEl insomnio puede regresar ante estresores vitales — esto es normal. Tener el plan escrito permite intervenir antes de que se cronifique.`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Escribir el plan personal de mantenimiento. Completar ISI y PSQI de seguimiento.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"La reestructuración cognitiva fue el único componente con asociación significativa a remisión a largo plazo (iOR 1.59)."}]:[]),</p>
+<p class="p1"><span class="Apple-converted-space">    </span>...(n&gt;=8?[{n:8,title:"Sesión de seguimiento — 4 semanas post-tratamiento",focus:"Booster session",evidenceLevel:"mantenimiento",evidence:"Sesión booster post-tratamiento — mantenimiento de remisión (Morin et al. Sleep. 2009)",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>content:[</p>
+<p class="p1"><span class="Apple-converted-space">       </span>{heading:"Evaluación de mantenimiento",body:`Reaplicar ISI y comparar con post-tratamiento.\n\nCriterios para sesiones adicionales:\n• ISI &gt;14: reiniciar protocolo completo\n• ISI 8-14: sesiones de refuerzo focalizadas\n• ISI &lt;8: alta terapéutica con seguimiento a 3 y 6 meses`},</p>
+<p class="p1"><span class="Apple-converted-space">     </span>],</p>
+<p class="p1"><span class="Apple-converted-space">     </span>tarea:"Mantener horario de sueño regular. Contactar al clínico si ISI &gt;14.",</p>
+<p class="p1"><span class="Apple-converted-space">     </span>nota:"Una sesión booster a las 4 semanas post-tratamiento está asociada a mayor mantenimiento de ganancias (Morin CM et al. Sleep. 2009)."}]:[])</p>
+<p class="p1"><span class="Apple-converted-space">  </span>];</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── DIAGNOSTICS ───────────────────────────────────────────────────────────────</p>
+<p class="p1">const DIAG_CATS=["Todos","Insomnias","Trastornos respiratorios","Hipersomnias","Trastornos circadianos","Parasomnias","Trastornos de movimiento","Comórbidos / asociados"];</p>
+<p class="p1">const DX=[</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"ic",cat:"Insomnias",name:"Insomnio crónico",def:"Dificultad persistente para iniciar o mantener el sueño con impacto diurno ≥3 meses.",icsd:"≥3 noches/semana, ≥3 meses, impacto diurno, oportunidad adecuada de sueño.",dsm:"Trastorno de insomnio — ≥3 meses, ≥3 noches/sem, malestar/deterioro funcional.",scales:["ISI","PSQI"],alarms:["Ideación suicida","Síntomas psicóticos","Pérdida ponderal"],evidence:"Ia",ref:"Sateia MJ. Chest. 2014 | Riemann D et al. J Sleep Res. 2023."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"ia",cat:"Insomnias",name:"Insomnio agudo",def:"Insomnio &lt;3 meses, precipitado por estresor identificable.",icsd:"Criterios similares al insomnio crónico pero duración &lt;3 meses.",dsm:"Trastorno de insomnio especificado si duración &lt;3 meses.",scales:["ISI","PSQI"],alarms:["Persistencia &gt;3 meses","Inicio de sustancias"],evidence:"IIb",ref:"AASM. ICSD-3-TR. 2023."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"ips",cat:"Insomnias",name:"Insomnio psicofisiológico",def:"Insomnio condicionado por hiperarousal somático y asociaciones negativas con el entorno de sueño.",icsd:"Hiperarousal cognitivo-somático, dificultad para dormirse en cama propia pero no en otro contexto.",dsm:"Trastorno de insomnio.",scales:["ISI","PSQI"],alarms:["Respuesta paradójica a BZD","Ansiedad generalizada"],evidence:"IIa",ref:"Harvey AG. Psychol Rev. 2002."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"ipar",cat:"Insomnias",name:"Insomnio paradójico",def:"Queja de sueño muy insuficiente con PSG relativamente normal.",icsd:"Queja severa de insomnio con mínima evidencia objetiva.",dsm:"Espectro del trastorno de insomnio.",scales:["ISI","PSQI"],alarms:["No sobretratar con hipnóticos","PSG ante discordancia severa"],evidence:"IIb",ref:"Edinger JD et al. Sleep. 2011."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"icom",cat:"Insomnias",name:"Insomnio comórbido",def:"Insomnio que coexiste con condición médica/psiquiátrica como entidad independiente.",icsd:"Entidad independiente que requiere tratamiento propio.",dsm:"Codificar ambas condiciones independientemente.",scales:["ISI","PSQI"],alarms:["Evaluar depresión (PHQ-9)","Descartar AOS"],evidence:"Ia",ref:"Morin CM et al. Sleep Med Rev. 2015."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"aos",cat:"Trastornos respiratorios",name:"Apnea obstructiva del sueño",def:"Colapso recurrente de vía aérea superior durante el sueño.",icsd:"IAH ≥15/h sin síntomas, o ≥5/h con somnolencia/ronquido/apneas/comorbilidades.",dsm:"Apnea/hipopnea obstructiva del sueño.",scales:["STOP-Bang","ESS","PSQI"],alarms:["IAH &gt;30 sin Tx","HTA refractaria","Arritmias nocturnas"],evidence:"Ia",ref:"Kapur VK et al. J Clin Sleep Med. 2017."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"acs",cat:"Trastornos respiratorios",name:"Apnea central del sueño",def:"Cese del flujo aéreo por ausencia de esfuerzo ventilatorio.",icsd:"≥5 apneas centrales/hora en PSG.",dsm:"Apnea/hipopnea del sueño — subtipo central.",scales:["STOP-Bang","ESS"],alarms:["IC concomitante","Opioides","ACV reciente"],evidence:"IIa",ref:"Gottlieb DJ, Punjabi NM. JAMA. 2020."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"hipo",cat:"Trastornos respiratorios",name:"Hipoventilación relacionada al sueño",def:"Reducción de ventilación durante el sueño con hipercapnia.",icsd:"PaCO₂ &gt;55 mmHg ≥10 min, o incremento ≥10 mmHg respecto a vigilia.",dsm:"Hipoventilación relacionada con el sueño.",scales:["STOP-Bang","ESS"],alarms:["Cefalea matutina","Poliglobulia","Cor pulmonale"],evidence:"IIa",ref:"Masa JF et al. Lancet Respir Med. 2019."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"n1",cat:"Hipersomnias",name:"Narcolepsia tipo 1",def:"SDE, cataplejía y deficiencia de hipocretina-1.",icsd:"SDE ≥3 meses + cataplejía Y/O hipocretina LCR ≤110 pg/mL, o MSLT ≤8 min + ≥2 SOREMP.",dsm:"Narcolepsia con cataplejía/deficiencia de hipocretina.",scales:["ESS","PSQI"],alarms:["Cataplejía","Alucinaciones hipnagógicas","Conducta automática"],evidence:"Ia",ref:"Bassetti CLA et al. Nat Rev Dis Primers. 2019."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"hi",cat:"Hipersomnias",name:"Hipersomnia idiopática",def:"SDE crónica sin cataplejía, sin SOREMP en MSLT, con sueño prolongado.",icsd:"SDE ≥3 meses + MSLT &lt;2 SOREMP, o TTS ≥660 min en 24h.",dsm:"Hipersomnia sin trastorno mental coexistente.",scales:["ESS","PSQI"],alarms:["Borrachera de sueño severa","Deterioro laboral grave"],evidence:"IIa",ref:"Trotti LM. Sleep Med Rev. 2017."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"fsr",cat:"Trastornos circadianos",name:"Síndrome de fase de sueño retrasada",def:"Retraso del ciclo sueño-vigilia ≥2h, crónico, con incapacidad de avanzar.",icsd:"Retraso ≥2h del periodo principal de sueño, ≥3 meses.",dsm:"Trastorno de ritmo circadiano — tipo fase retrasada.",scales:["PSQI","ESS"],alarms:["Inicio adolescencia","Comorbilidad depresión/TDAH"],evidence:"IIa",ref:"Auger RR et al. J Clin Sleep Med. 2015."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"turn",cat:"Trastornos circadianos",name:"Trastorno por trabajo en turnos",def:"Insomnio y/o SDE por horarios laborales superpuestos al periodo de sueño habitual.",icsd:"Insomnio/SDE asociado a trabajo en turnos ≥3 meses.",dsm:"Trastorno de ritmo circadiano — tipo turnos.",scales:["ISI","ESS","PSQI"],alarms:["Errores críticos","Accidentes de tránsito"],evidence:"IIa",ref:"Drake CL et al. Sleep. 2004."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"son",cat:"Parasomnias",name:"Sonambulismo",def:"Deambulación o conductas complejas durante sueño N3 con amnesia posterior.",icsd:"Arousal incompleto de N3, conductas motoras complejas, amnesia.",dsm:"Trastorno de arousal NREM — tipo sonambulismo.",scales:["PSQI"],alarms:["Conductas peligrosas","Inicio en adultos"],evidence:"IIa",ref:"Stallman HM et al. Sleep Med Rev. 2016."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"tcsr",cat:"Parasomnias",name:"Trastorno de conducta del sueño REM",def:"Actividad motora compleja durante sueño REM por pérdida de atonía muscular.",icsd:"Conductas durante REM + RSWA en PSG o videoPSG diagnóstica.",dsm:"Trastorno de conducta del sueño REM.",scales:["PSQI"],alarms:["Marcador preclínico sinucleinopatía","Lesiones al compañero"],evidence:"Ia",ref:"Postuma RB et al. Neurology. 2019."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"pes",cat:"Parasomnias",name:"Trastorno de pesadillas",def:"Pesadillas recurrentes con malestar significativo o deterioro funcional.",icsd:"Sueños perturbadores recurrentes desde REM con malestar o deterioro.",dsm:"Trastorno de pesadillas.",scales:["PSQI","ISI"],alarms:["TEPT subyacente","Medicamentos (betabloqueadores)"],evidence:"IIa",ref:"Morgenthaler TI et al. Sleep. 2018."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"spi",cat:"Trastornos de movimiento",name:"Síndrome de piernas inquietas",def:"Urgencia de mover piernas con sensaciones desagradables, predominio nocturno.",icsd:"5 criterios IRLSSG: urgencia + sensaciones, inicio con reposo, alivio con movimiento, predominio vespertino/nocturno.",dsm:"Síndrome de piernas inquietas.",scales:["IRLS","PSQI"],alarms:["Ferritina &lt;50 ng/mL","Insuficiencia renal","Embarazo"],evidence:"Ia",ref:"Allen RP et al. Sleep Med. 2014 | Silber MH et al. Mayo Clin Proc. 2021."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"brux",cat:"Trastornos de movimiento",name:"Bruxismo del sueño",def:"Actividad parafuncional del masétero durante sueño.",icsd:"Diagnóstico clínico: rechinado + desgaste dental, dolor mandibular matutino.",dsm:"No categoría específica.",scales:["PSQI"],alarms:["Dolor orofacial crónico","Cefalea tensional matutina"],evidence:"IIa",ref:"Lobbezoo F et al. J Oral Rehabil. 2018."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"sp",cat:"Comórbidos / asociados",name:"Trastornos del sueño en trastornos psiquiátricos",def:"Insomnio, hipersomnia o alteraciones REM en depresión, ansiedad o bipolar.",icsd:"Diagnosticar y tratar independientemente de la condición psiquiátrica.",dsm:"Especificar comorbilidad. En TDM: insomnio/hipersomnia como criterio.",scales:["ISI","PSQI","ESS"],alarms:["Insomnio como pródromo de manía","Riesgo suicida"],evidence:"Ia",ref:"Harvey AG. Annu Rev Clin Psychol. 2008."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"sn",cat:"Comórbidos / asociados",name:"Trastornos del sueño en enfermedades neurológicas",def:"Trastornos del sueño en Parkinson, Alzheimer, epilepsia.",icsd:"Diagnosticar independientemente. TCSR como marcador preclínico de sinucleinopatía.",dsm:"Trastorno del sueño debido a afección médica.",scales:["ESS","PSQI","ISI","IRLS"],alarms:["TCSR preclínico Parkinson","Epilepsia nocturna vs parasomnia"],evidence:"IIa",ref:"Iranzo A. Curr Neurol Neurosci Rep. 2016."},</p>
+<p class="p1">];</p>
+<p class="p2"><br></p>
+<p class="p1">// ── GLOSSARY ──────────────────────────────────────────────────────────────────</p>
+<p class="p1">const GLOS=[</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"AHI / IAH",d:"Índice de Apnea-Hipopnea. Normal &lt;5; leve 5-14; moderado 15-29; severo ≥30 eventos/hora."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Atonía muscular REM",d:"Parálisis muscular fisiológica durante REM. Su ausencia define el TCSR."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Cataplejía",d:"Pérdida súbita del tono muscular por emoción intensa. Patognomónica de narcolepsia tipo 1."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"CPAP",d:"Presión Positiva Continua en Vía Aérea. Primera línea en AOS moderada-severa."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Eficiencia del sueño (ES)",d:"ES = TTS ÷ TEC × 100%. Normal ≥85%. Meta terapéutica en restricción del sueño TCC-I."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Hiperarousal",d:"Activación fisiológica y cognitiva elevada. Mecanismo central del insomnio crónico. Objetivo de TCC-I."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Hipnograma",d:"Gráfica de la arquitectura del sueño — ciclos NREM-REM a lo largo de la noche."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Hipocretina/Orexina",d:"Neuropéptido hipotalámico. Deficiencia (≤110 pg/mL en LCR) = narcolepsia tipo 1."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"ICSD-3 TR",d:"International Classification of Sleep Disorders, 3rd ed. Text Revision. AASM, 2023."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"iOR",d:"Incremental Odds Ratio. Beneficio incremental de cada componente TCC-I (Furukawa et al. JAMA Psychiatry 2024)."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Latencia de sueño (LS)",d:"Tiempo desde que se intenta dormir hasta N1. Normal &lt;20 min. Punto de corte clínico &gt;30 min."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Modelo 3P",d:"Spielman: factores Predisponentes, Precipitantes y Perpetuantes del insomnio. Base conceptual de TCC-I."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"MSLT",d:"Multiple Sleep Latency Test. Latencia media ≤8 min + ≥2 SOREMP: diagnóstico de narcolepsia."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Polisomnografía (PSG)",d:"Estudio gold standard del sueño. Registra EEG, EOG, EMG, flujo aéreo, SpO₂, ECG."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Presión homeostática",d:"Proceso S de Borbely: necesidad de sueño acumulada durante la vigilia. La restricción del sueño la aumenta."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Regla de los 20 min",d:"Control de estímulos: si no se duerme en ~20 min, levantarse. Rompe el condicionamiento cama-vigilia."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Restricción del sueño",d:"Ventana = TTS promedio + 30 min (mínimo 5.5h). Ajuste semanal por ES. iOR 1.49 (Furukawa 2024)."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"RSWA",d:"REM Sleep Without Atonia. Hallazgo PSG diagnóstico en TCSR."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"SOREMP",d:"Sleep Onset REM Period. REM ≤15 min del inicio del sueño. ≥2 en MSLT: criterio de narcolepsia."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"TCC-I",d:"Terapia Cognitivo-Conductual para el Insomnio. Paquete óptimo (Furukawa 2024): reestructuración cognitiva (1.68) + tercera ola (1.49) + restricción del sueño (1.49) + control de estímulos (1.43) + presencial (1.83)."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"TEC",d:"Tiempo en Cama. Tiempo total desde acostarse hasta levantarse. Manipulado en la restricción del sueño."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"TTS",d:"Tiempo Total de Sueño. TEC − LS − WASO. Normal 7-9h en adultos."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"WASO",d:"Wake After Sleep Onset. Tiempo despierto después del inicio del sueño. Clínicamente significativo &gt;30 min."},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{t:"Zeitgeber",d:"Sincronizador del ritmo circadiano. Principal: luz. También: temperatura, ejercicio, horarios de comida."},</p>
+<p class="p1">].sort((a,b)=&gt;a.t.localeCompare(b.t,"es"));</p>
+<p class="p2"><br></p>
+<p class="p1">// ── FORMULAS ──────────────────────────────────────────────────────────────────</p>
+<p class="p1">const FORMULAS=[</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"tts",name:"Tiempo Total de Sueño promedio (TTS)",desc:"Calcula el TTS promedio semanal a partir del diario de sueño.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"d1",label:"TTS día 1 (h)",ph:"5.5"},{id:"d2",label:"TTS día 2 (h)",ph:"6.0"},{id:"d3",label:"TTS día 3 (h)",ph:"5.0"},{id:"d4",label:"TTS día 4 (h)",ph:"6.5"},{id:"d5",label:"TTS día 5 (h)",ph:"5.5"},{id:"d6",label:"TTS día 6 (h)",ph:"4.5"},{id:"d7",label:"TTS día 7 (h)",ph:"6.0"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const vals=Object.values(v).map(Number).filter(x=&gt;!isNaN(x)&amp;&amp;x&gt;0);if(vals.length&lt;3)return null;const avg=vals.reduce((s,x)=&gt;s+x,0)/vals.length;return{value:avg.toFixed(1),unit:"horas/noche",interp:avg&gt;=7?"TTS normal (7-9h, AASM 2015). Verificar eficiencia del sueño.":avg&gt;=6?`TTS leve-moderadamente reducido. Ventana de sueño inicial sugerida: ${(avg+0.5).toFixed(1)}h.`:`TTS significativamente reducido. Ventana sugerida: ${Math.max(5.5,avg+0.5).toFixed(1)}h (mínimo 5.5h). Alertar sobre somnolencia transitoria.`};}},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"es",name:"Eficiencia del Sueño (ES)",desc:"ES = (TTS ÷ TEC) × 100%. Meta terapéutica ≥85% en TCC-I.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"tts",label:"TTS — horas dormidas",ph:"5.5"},{id:"tec",label:"TEC — tiempo en cama (h)",ph:"8.0"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const tts=Number(v.tts),tec=Number(v.tec);if(!tts||!tec)return null;const es=(tts/tec)*100;return{value:es.toFixed(1),unit:"%",interp:es&gt;=90?"ES ≥90%: AUMENTAR ventana 15-20 min.":es&gt;=85?"ES 85-89%: MANTENER ventana sin cambios.":es&gt;=75?"ES 75-84%: MANTENER o reducir 15 min.":"ES &lt;75%: REDUCIR ventana 15 min. Reforzar adherencia."};}},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"vs",name:"Ventana de Sueño inicial",desc:"Calcula la hora de acostarse prescrita según TTS promedio y hora de levantada fija.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"tts",label:"TTS promedio (h)",ph:"5.2"},{id:"hl",label:"Hora de levantada (HH:MM)",ph:"06:30"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const tts=Number(v.tts);const[hh,mm]=(v.hl||"").split(":").map(Number);if(!tts||isNaN(hh)||isNaN(mm))return null;const vs=Math.max(5.5,tts+0.5);const hlMin=hh*60+mm;let hcMin=hlMin-(vs*60);if(hcMin&lt;0)hcMin+=1440;const hcH=Math.floor(hcMin/60)%24,hcM=Math.round(hcMin%60);const hcStr=`${String(hcH).padStart(2,"0")}:${String(hcM).padStart(2,"0")}`;return{value:`${vs.toFixed(1)}h — Acostarse: ${hcStr}`,unit:"",interp:`Ventana: ${vs.toFixed(1)}h. Acostarse: ${hcStr}. Levantada fija: ${v.hl}.\nNO acostarse antes de las ${hcStr} aunque tenga sueño.`};}},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"ls",name:"Latencia de Sueño promedio (LS)",desc:"Tiempo promedio para conciliar el sueño. Punto de corte clínico &gt;30 min.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"d1",label:"LS día 1 (min)",ph:"45"},{id:"d2",label:"LS día 2 (min)",ph:"30"},{id:"d3",label:"LS día 3 (min)",ph:"60"},{id:"d4",label:"LS día 4 (min)",ph:"40"},{id:"d5",label:"LS día 5 (min)",ph:"55"},{id:"d6",label:"LS día 6 (min)",ph:"35"},{id:"d7",label:"LS día 7 (min)",ph:"50"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const vals=Object.values(v).map(Number).filter(x=&gt;!isNaN(x)&amp;&amp;x&gt;=0);if(vals.length&lt;3)return null;const avg=vals.reduce((s,x)=&gt;s+x,0)/vals.length;return{value:avg.toFixed(0),unit:"minutos",interp:avg&lt;=15?"LS normal (≤15 min).":avg&lt;=30?"LS levemente prolongada (15-30 min). Monitorear.":avg&lt;=60?"LS prolongada (&gt;30 min) — clínicamente significativa. Control de estímulos indicado.":"LS muy prolongada (&gt;60 min). Control de estímulos + restricción del sueño prioritarios."};}},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"waso",name:"WASO promedio",desc:"Tiempo promedio despierto después de dormirse. Punto de corte: &gt;30 min.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"d1",label:"WASO día 1 (min)",ph:"60"},{id:"d2",label:"WASO día 2 (min)",ph:"45"},{id:"d3",label:"WASO día 3 (min)",ph:"90"},{id:"d4",label:"WASO día 4 (min)",ph:"30"},{id:"d5",label:"WASO día 5 (min)",ph:"75"},{id:"d6",label:"WASO día 6 (min)",ph:"50"},{id:"d7",label:"WASO día 7 (min)",ph:"40"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const vals=Object.values(v).map(Number).filter(x=&gt;!isNaN(x)&amp;&amp;x&gt;=0);if(vals.length&lt;3)return null;const avg=vals.reduce((s,x)=&gt;s+x,0)/vals.length;return{value:avg.toFixed(0),unit:"minutos",interp:avg&lt;=20?"WASO normal (≤20 min).":avg&lt;=30?"WASO limítrofe. Monitorear.":avg&lt;=60?"WASO clínicamente significativo (&gt;30 min). Restricción del sueño indicada (iMD −7 min, Furukawa 2024).":"WASO muy elevado (&gt;60 min). Restricción + control de estímulos prioritarios. Descartar AOS."};}},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"imc",name:"Índice de Masa Corporal (IMC)",desc:"Relevante para tamizaje de AOS y Síndrome de Hipoventilación por Obesidad.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"peso",label:"Peso (kg)",ph:"85"},{id:"talla",label:"Talla (m)",ph:"1.72"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const p=Number(v.peso),t=Number(v.talla);if(!p||!t)return null;const imc=p/(t*t);return{value:imc.toFixed(1),unit:"kg/m²",interp:imc&lt;25?"Peso normal. Riesgo bajo para AOS por obesidad.":imc&lt;30?"Sobrepeso. Riesgo moderado para AOS. Aplicar STOP-Bang.":imc&lt;35?"Obesidad grado I. Riesgo elevado para AOS. STOP-Bang + poligrafía recomendada.":imc&lt;40?"Obesidad grado II. Criterio STOP-Bang positivo (B+). Evaluación especializada.":"Obesidad grado III. Riesgo muy alto AOS severa y SHO. PSG/poligrafía urgente."};}},</p>
+<p class="p1"><span class="Apple-converted-space">  </span>{id:"nnt",name:"NNT — Número Necesario a Tratar (TCC-I)",desc:"Cuántos pacientes tratar con TCC-I para que uno remita vs psicoeducación. Furukawa 2024.",</p>
+<p class="p1"><span class="Apple-converted-space">   </span>fields:[{id:"cer",label:"Tasa de remisión control (0.0-1.0)",ph:"0.14"}],</p>
+<p class="p1"><span class="Apple-converted-space">   </span>calc:v=&gt;{const cer=Number(v.cer);if(!cer||cer&lt;=0||cer&gt;=1)return null;const or=5.34;const en=or*cer,ed=1-cer+en,eer=en/ed,rd=eer-cer,nnt=1/rd;return{value:nnt.toFixed(1),unit:"pacientes",interp:`Con CER ${(cer*100).toFixed(0)}%:\n• Tasa de remisión con TCC-I: ${(eer*100).toFixed(1)}%\n• Diferencia de riesgo: +${(rd*100).toFixed(1)}%\n• NNT: ${nnt.toFixed(1)} pacientes\nFuente: Furukawa Y et al. JAMA Psychiatry. 2024;81(4):357-365.`};}},</p>
+<p class="p1">];</p>
+<p class="p2"><br></p>
+<p class="p1">// ── UI COMPONENTS ─────────────────────────────────────────────────────────────</p>
+<p class="p1">const PC={"Ia":GREEN,"IIa":AMBER,"IIb":GRAY};</p>
+<p class="p1">const SC={"beneficio":BRAND,"control":GRAY,"mantenimiento":GREEN};</p>
+<p class="p1">const SL={"beneficio":"Componente activo","control":"Marco educativo","mantenimiento":"Mantenimiento"};</p>
+<p class="p2"><br></p>
+<p class="p1">function ScaleForm({scale,onComplete,onBack}){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [ans,setAns]=useState({});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(scale.id==="psqi"){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const r=calcPSQI(ans);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cNames=["Calidad subjetiva","Latencia","Duración","Eficiencia","Perturbaciones","Medicación","Disfunción diurna"];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const cVals=[r.c1,r.c2,r.c3,r.c4,r.c5,r.c6,r.c7];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return(</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}&gt;← Volver&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style={{fontSize:17,fontWeight:500,marginBottom:4}}&gt;{scale.name}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:"0.5rem"}}&gt;{scale.desc}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{padding:"0.75rem 1rem",background:BRAND_LIGHT,borderRadius:8,marginBottom:"1.5rem",fontSize:12,color:BRAND}}&gt;Responda pensando en el ÚLTIMO MES. Puede contestarlo usted mismo/a o su paciente.&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,fontWeight:500,marginBottom:12}}&gt;Horarios de sueño habituales&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{[{id:"q1",text:"¿A qué hora acostumbra acostarse por la noche?",type:"time"},{id:"q3",text:"¿A qué hora acostumbra levantarse por la mañana?",type:"time"},{id:"q4",text:"¿Cuántas horas de sueño real durmió por noche en el último mes?",type:"number",step:"0.5",ph:"Ej: 6.5"},{id:"q2",text:"¿Cuántos minutos tarda habitualmente en quedarse dormido/a?",type:"number",ph:"Minutos"}].map(item=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div key={item.id} style={{marginBottom:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:13,marginBottom:4,color:"#555577"}}&gt;{item.text}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;input type={item.type} placeholder={item.ph||""} step={item.step||"1"} value={ans[item.id]||""} onChange={e=&gt;setAns({...ans,[item.id]:e.target.value})}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>style={{padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e",width:180}}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,fontWeight:500,marginBottom:4}}&gt;En el último mes, ¿con qué frecuencia tuvo problemas para dormir por estas razones?&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:11,color:"#999",marginBottom:12}}&gt;0 = Ninguna vez | 1 = Menos de 1 vez/sem | 2 = 1-2 veces/sem | 3 = 3 o más veces/sem&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{PSQI_ITEMS.filter(i=&gt;i.type==="freq").map(item=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div key={item.id} style={{marginBottom:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:12,color:"#555577",marginBottom:5}}&gt;{item.text}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{display:"flex",flexWrap:"wrap",gap:4}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{FREQ_OPTS.map((opt,j)=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button key={j} onClick={()=&gt;setAns({...ans,[item.id]:FREQ_VALS[j]})}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{padding:"4px 8px",fontSize:11,borderRadius:16,border:ans[item.id]===FREQ_VALS[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[item.id]===FREQ_VALS[j]?BRAND_LIGHT:"#fff",color:ans[item.id]===FREQ_VALS[j]?BRAND_MID:"#1a1a2e",cursor:"pointer"}}&gt;{j}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,fontWeight:500,marginBottom:12}}&gt;Percepción y funcionamiento&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{PSQI_ITEMS.filter(i=&gt;i.type==="select").map(item=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div key={item.id} style={{marginBottom:12}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:6}}&gt;{item.text}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{display:"flex",flexDirection:"column",gap:5}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{item.options.map((opt,j)=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button key={j} onClick={()=&gt;setAns({...ans,[item.id]:item.optValues[j]})}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{padding:"7px 12px",fontSize:12,borderRadius:8,border:ans[item.id]===item.optValues[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[item.id]===item.optValues[j]?BRAND_LIGHT:"#fff",color:ans[item.id]===item.optValues[j]?BRAND_MID:"#1a1a2e",cursor:"pointer",textAlign:"left"}}&gt;{opt}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{[{id:"q7",label:"¿Con qué frecuencia tomó medicamentos para dormir (con o sin receta)?"},{id:"q8",label:"¿Con qué frecuencia tuvo dificultades para mantenerse despierto/a al conducir, comer o en actividades sociales?"}].map(item=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div key={item.id} style={{marginBottom:12}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:6}}&gt;{item.label}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{display:"flex",flexWrap:"wrap",gap:4}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{FREQ_OPTS.map((opt,j)=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button key={j} onClick={()=&gt;setAns({...ans,[item.id]:FREQ_VALS[j]})}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>style={{padding:"4px 8px",fontSize:11,borderRadius:16,border:ans[item.id]===FREQ_VALS[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[item.id]===FREQ_VALS[j]?BRAND_LIGHT:"#fff",color:ans[item.id]===FREQ_VALS[j]?BRAND_MID:"#1a1a2e",cursor:"pointer"}}&gt;{j}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{cVals.some(c=&gt;c!==null)&amp;&amp;(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:13,fontWeight:500,marginBottom:10}}&gt;Componentes (0-3 cada uno)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:6}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{cNames.map((n,i)=&gt;cVals[i]!==null&amp;&amp;(</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div key={i} style={{padding:"0.5rem 0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:10,color:"#999",margin:"0 0 2px"}}&gt;{n}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:18,fontWeight:500,margin:0,color:cVals[i]===0?GREEN:cVals[i]===1?AMBER:cVals[i]===2?"#E24B4A":RED}}&gt;{cVals[i]}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{r.total!==null&amp;&amp;(</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{margin:"1rem 0",padding:"1rem 1.25rem",borderRadius:10,border:`1.5px solid ${r.total&lt;=5?GREEN:r.total&lt;=10?AMBER:RED}`}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span style={{fontSize:13,color:"#555577"}}&gt;Puntaje global PSQI&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span style={{fontSize:28,fontWeight:500,color:r.total&lt;=5?GREEN:r.total&lt;=10?AMBER:RED}}&gt;{r.total} / 21&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{padding:"5px 12px",borderRadius:20,background:(r.total&lt;=5?GREEN:r.total&lt;=10?AMBER:RED)+"22",display:"inline-block",fontSize:13,fontWeight:500,color:r.total&lt;=5?GREEN:r.total&lt;=10?AMBER:RED,marginBottom:6}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{r.total&lt;=5?"Buena calidad de sueño":r.total&lt;=10?"Mala calidad de sueño":"Muy mala calidad / trastorno probable"}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:11,color:"#999",margin:0}}&gt;Ref: Buysse DJ et al. 1989 | Mollayeva et al. Sleep Med Rev. 2016.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onClick={()=&gt;r.total!==null&amp;&amp;onComplete({scaleId:"psqi",scaleName:"PSQI",score:r.total,max:21,label:r.total&lt;=5?"Buena calidad":r.total&lt;=10?"Mala calidad":"Muy mala calidad",risk:r.total&lt;=5?"bajo":r.total&lt;=10?"moderado":"alto",date:new Date().toISOString()})}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>disabled={r.total===null} style={{padding:"10px 24px",borderRadius:8,border:"none",background:r.total!==null?BRAND:"#e0e0ee",color:"#fff",fontWeight:500,cursor:r.total!==null?"pointer":"not-allowed",fontSize:14}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>Guardar resultado</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const score=scale.questions.every((_,i)=&gt;ans[i]!==undefined)?scale.questions.reduce((_,x,i)=&gt;_+ans[i],0):null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const interp=score!==null?scale.interpret(score):null;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return(</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}&gt;← Volver&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2 style={{fontSize:17,fontWeight:500,marginBottom:4}}&gt;{scale.name}&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:"1.5rem"}}&gt;{scale.desc}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{scale.questions.map((q,i)=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div key={i} style={{marginBottom:"1rem",padding:"0.875rem 1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,fontWeight:500,marginBottom:8}}&gt;{i+1}. {q}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",flexWrap:"wrap",gap:6}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{scale.options.map((opt,j)=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;button key={j} onClick={()=&gt;setAns({...ans,[i]:scale.optionValues[j]})}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>style={{padding:"4px 10px",fontSize:12,borderRadius:20,border:ans[i]===scale.optionValues[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[i]===scale.optionValues[j]?BRAND_LIGHT:"#fff",color:ans[i]===scale.optionValues[j]?BRAND_MID:"#1a1a2e",cursor:"pointer"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{opt}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{score!==null&amp;&amp;(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{margin:"1.5rem 0",padding:"1rem 1.25rem",borderRadius:10,border:`1.5px solid ${interp.color}`}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span style={{fontSize:13,color:"#555577"}}&gt;Puntaje total&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;span style={{fontSize:28,fontWeight:500,color:interp.color}}&gt;{score} / {scale.max}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{padding:"5px 12px",borderRadius:20,background:interp.color+"22",display:"inline-block",fontSize:13,color:interp.color,fontWeight:500,marginBottom:6}}&gt;{interp.label}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{interp.detail&amp;&amp;&lt;p style={{fontSize:12,color:"#555577",margin:"6px 0 4px",lineHeight:1.6}}&gt;{interp.detail}&lt;/p&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:11,color:"#999",margin:0}}&gt;Ref: {scale.ref}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onClick={()=&gt;score!==null&amp;&amp;onComplete({scaleId:scale.id,scaleName:scale.name,score,max:scale.max,label:interp.label,risk:interp.risk,date:new Date().toISOString()})}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>disabled={score===null} style={{padding:"10px 24px",borderRadius:8,border:"none",background:score!==null?BRAND:"#e0e0ee",color:"#fff",fontWeight:500,cursor:score!==null?"pointer":"not-allowed",fontSize:14}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Guardar resultado</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function TCCIPlan({patient,onBack}){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const le={};patient.evaluations?.forEach(e=&gt;{le[e.scaleId]=e;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const isi=le["isi"]?.score??14;const psqi=le["psqi"]?.score??8;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const sessions=buildSessions(isi,psqi);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [done,setDone]=useState(patient.tcciDone||{});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [exp,setExp]=useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const prog=sessions.filter(s=&gt;done[s.n]).length;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return(</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}&gt;← Volver al expediente&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"0.5rem",flexWrap:"wrap",gap:8}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style={{fontSize:17,fontWeight:500,margin:0}}&gt;Plan TCC-I personalizado&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span style={{fontSize:12,padding:"4px 12px",borderRadius:20,background:BRAND_LIGHT,color:BRAND_MID}}&gt;{sessions.length} sesiones · {sessions.length&gt;=8?"Insomnio severo":sessions.length&gt;=7?"Insomnio moderado":"Leve-moderado"}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p style={{fontSize:12,color:"#555577",marginBottom:"1rem"}}&gt;Paquete óptimo basado en Furukawa et al. JAMA Psychiatry 2024 (cNMA, 241 ensayos, n=31,452).&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"1.25rem"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{flex:1,height:6,background:"#e0e0ee",borderRadius:3,overflow:"hidden"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{height:"100%",width:`${(prog/sessions.length)*100}%`,background:BRAND,borderRadius:3}}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span style={{fontSize:12,color:"#555577",whiteSpace:"nowrap"}}&gt;{prog}/{sessions.length} sesiones&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{sessions.map(s=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div key={s.n} style={{marginBottom:8,borderRadius:10,border:`0.5px solid ${exp===s.n?BRAND:"#e0e0ee"}`,overflow:"hidden",opacity:done[s.n]?0.6:1}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{padding:"0.875rem 1rem",background:done[s.n]?"#f4f4f8":"#fff",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=&gt;setExp(exp===s.n?null:s.n)}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button onClick={e=&gt;{e.stopPropagation();setDone({...done,[s.n]:!done[s.n]});}}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>style={{width:22,height:22,borderRadius:"50%",border:`1.5px solid ${done[s.n]?BRAND:"#c8c8dd"}`,background:done[s.n]?BRAND:"transparent",cursor:"pointer",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{done[s.n]&amp;&amp;&lt;i className="ti ti-check" style={{fontSize:12,color:"#fff"}}&gt;&lt;/i&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{flex:1}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span style={{fontSize:11,color:"#999"}}&gt;Sesión {s.n}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span style={{fontSize:13,fontWeight:500}}&gt;{s.title}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:SC[s.evidenceLevel]+"22",color:SC[s.evidenceLevel]}}&gt;{SL[s.evidenceLevel]}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:11,color:"#555577",margin:"2px 0 0"}}&gt;{s.focus}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;i className={`ti ${exp===s.n?"ti-chevron-up":"ti-chevron-down"}`} style={{color:"#999",fontSize:15,flexShrink:0}}&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{exp===s.n&amp;&amp;(</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{padding:"0 1rem 1rem",background:"#f4f4f8",borderTop:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{marginTop:"0.875rem",display:"grid",gap:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{s.evidence&amp;&amp;&lt;div style={{padding:"0.625rem 0.875rem",background:SC[s.evidenceLevel]+"15",borderRadius:8,borderLeft:`3px solid ${SC[s.evidenceLevel]}`}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:11,fontWeight:500,color:SC[s.evidenceLevel],margin:"0 0 2px"}}&gt;Evidencia&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:12,margin:0,color:"#555577"}}&gt;{s.evidence}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{s.content?.map((c,ci)=&gt;(</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;div key={ci} style={{padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p style={{fontSize:13,fontWeight:500,margin:"0 0 8px",color:BRAND_MID}}&gt;{c.heading}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p style={{fontSize:12,color:"#555577",margin:0,lineHeight:1.7,whiteSpace:"pre-wrap"}}&gt;{c.body}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{s.tarea&amp;&amp;&lt;div style={{padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:12,fontWeight:500,margin:"0 0 4px"}}&gt;Tarea intersesión&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:12,color:"#555577",margin:0,lineHeight:1.6}}&gt;{s.tarea}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{s.nota&amp;&amp;&lt;div style={{padding:"0.625rem 0.875rem",background:"#fff",borderRadius:8,borderLeft:"3px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;p style={{fontSize:11,color:"#999",margin:0,lineHeight:1.5,fontStyle:"italic"}}&gt;{s.nota}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;button onClick={async(e)=&gt;{e.stopPropagation();try{await generateSessionPDF(patient,s);}catch(err){alert("Error PDF: "+err.message);}}}</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>style={{padding:"8px 16px",fontSize:12,borderRadius:8,border:"none",background:GREEN,color:"#fff",cursor:"pointer",fontWeight:500,display:"flex",alignItems:"center",gap:6,width:"fit-content"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;i className="ti ti-file-type-pdf" style={{fontSize:14}}&gt;&lt;/i&gt; Plan semana {s.n} para el paciente</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>))}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function PatientReport({patient,onBack,onStartTCCI,onScaleSelect}){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [aiRep,setAiRep]=useState("");const [load,setLoad]=useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const le={};patient.evaluations?.forEach(e=&gt;{le[e.scaleId]=e;});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>async function gen(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setLoad(true);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const sum=Object.values(le).map(e=&gt;`${e.scaleName}: ${e.score}/${e.max} — ${e.label}`).join("\n");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"Especialista en medicina del sueño. Reporte clínico conciso en español. Formato: 1) Síntesis diagnóstica, 2) Correlación ICSD-3 TR/DSM-5-TR, 3) Estratificación de riesgo, 4) Abordaje terapéutico (TCC-I paquete óptimo Furukawa 2024 si aplica). Máximo 380 palabras.",messages:[{role:"user",content:`Paciente: ${patient.name}, ${patient.age||"?"}a.\n${sum}\nGenera reporte clínico.`}]})});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const d=await r.json();setAiRep(d.content?.[0]?.text||"Error.");}catch{setAiRep("Error de conexión.");}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>setLoad(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const cd={};patient.evaluations?.forEach(e=&gt;{if(!cd[e.scaleId])cd[e.scaleId]=[];cd[e.scaleId].push({date:new Date(e.date).toLocaleDateString("es-MX",{month:"short",day:"numeric"}),score:e.score,max:e.max});});</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const hasIns=(le["isi"]?.score&gt;=8)||(le["psqi"]?.score&gt;=6);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>return(</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}&gt;← Pacientes&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{display:"flex",alignItems:"center",gap:12,marginBottom:"1.5rem"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{width:48,height:48,borderRadius:"50%",background:BRAND_LIGHT,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,fontWeight:500,color:BRAND_MID}}&gt;{patient.name.split(" ").map(n=&gt;n[0]).join("").slice(0,2).toUpperCase()}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;h2 style={{fontSize:18,fontWeight:500,margin:0}}&gt;{patient.name}&lt;/h2&gt;&lt;p style={{fontSize:13,color:"#555577",margin:0}}&gt;{patient.age?`${patient.age} años · `:""}{patient.evaluations?.length||0} evaluaciones&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{Object.values(le).length&gt;0&amp;&amp;(&lt;div style={{marginBottom:"1.5rem"}}&gt;&lt;h3 style={{fontSize:15,fontWeight:500,marginBottom:10}}&gt;Últimos resultados&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:8}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{Object.values(le).map(e=&gt;{const ip=SCALES[e.scaleId]?.interpret(e.score);return(&lt;div key={e.scaleId} style={{padding:"0.75rem 1rem",background:"#f4f4f8",borderRadius:10,borderLeft:`3px solid ${ip?.color||"#888"}`}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:11,color:"#555577",margin:"0 0 3px"}}&gt;{e.scaleName.split("(")[0].trim()}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:22,fontWeight:500,margin:"0 0 2px",color:ip?.color}}&gt;{e.score}&lt;span style={{fontSize:12,color:"#999"}}&gt;/{e.max}&lt;/span&gt;&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:11,margin:0,color:ip?.color}}&gt;{e.label}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;);})}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{Object.entries(cd).some(([,v])=&gt;v.length&gt;1)&amp;&amp;(&lt;div style={{marginBottom:"1.5rem"}}&gt;&lt;h3 style={{fontSize:15,fontWeight:500,marginBottom:10}}&gt;Progreso en el tiempo&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{Object.entries(cd).map(([sid,vals])=&gt;vals.length&gt;1&amp;&amp;(&lt;div key={sid} style={{marginBottom:10,padding:"0.875rem 1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,fontWeight:500,marginBottom:8}}&gt;{SCALES[sid]?.name.split("(")[0].trim()}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",alignItems:"flex-end",gap:6,height:64}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{vals.map((v,i)=&gt;{const pct=v.score/v.max;const col=SCALES[sid]?.interpret(v.score)?.color||"#888";return(&lt;div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flex:1}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span style={{fontSize:10,color:col,fontWeight:500}}&gt;{v.score}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{width:"100%",height:Math.max(8,pct*48),background:col,borderRadius:4,opacity:0.8}}&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span style={{fontSize:9,color:"#999"}}&gt;{v.date}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;);})}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{marginBottom:"1.5rem",display:"flex",gap:8,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onClick={async()=&gt;{try{await generatePatientReportPDF(patient,aiRep);}catch(e){alert("Error PDF: "+e.message);}}}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>style={{padding:"9px 18px",fontSize:13,borderRadius:8,border:"none",background:GREEN,color:"#fff",cursor:"pointer",fontWeight:500,display:"flex",alignItems:"center",gap:6}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i className="ti ti-file-type-pdf" style={{fontSize:15}}&gt;&lt;/i&gt; Descargar reporte PDF</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{hasIns&amp;&amp;(&lt;div style={{marginBottom:"1.5rem",padding:"1rem 1.25rem",background:BRAND_LIGHT,borderRadius:10,border:`0.5px solid #AFA9EC`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;p style={{fontSize:14,fontWeight:500,color:BRAND_MID,margin:"0 0 3px"}}&gt;Plan TCC-I disponible&lt;/p&gt;&lt;p style={{fontSize:12,color:BRAND,margin:0}}&gt;Puntaje ISI/PSQI indica insomnio tratable con TCC-I.&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onClick={onStartTCCI} style={{padding:"8px 16px",fontSize:13,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer",fontWeight:500}}&gt;Ver plan TCC-I&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{marginBottom:"1.5rem"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 style={{fontSize:15,fontWeight:500,margin:0}}&gt;Reporte clínico con IA&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onClick={gen} disabled={load||Object.values(le).length===0} style={{padding:"6px 14px",fontSize:12,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",cursor:"pointer"}}&gt;{load?"Generando...":"Generar reporte ↗"}&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{aiRep&amp;&amp;&lt;div style={{padding:"1rem 1.25rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee",fontSize:13,lineHeight:1.7,whiteSpace:"pre-wrap"}}&gt;{aiRep}&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{!aiRep&amp;&amp;Object.values(le).length===0&amp;&amp;&lt;p style={{fontSize:13,color:"#999"}}&gt;Completa al menos una escala para generar el reporte.&lt;/p&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div&gt;&lt;h3 style={{fontSize:15,fontWeight:500,marginBottom:10}}&gt;Aplicar escala&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:8}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{Object.values(SCALES).map(s=&gt;(&lt;button key={s.id} onClick={()=&gt;onScaleSelect(s)} style={{padding:"0.75rem 1rem",textAlign:"left",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee",cursor:"pointer",fontSize:13,fontWeight:500,color:"#1a1a2e"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{s.name.split("(")[0].trim()}&lt;span style={{display:"block",fontSize:11,color:"#999",fontWeight:400}}&gt;{s.name.match(/\(([^)]+)\)/)?.[1]||""}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/button&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">// ── MAIN ──────────────────────────────────────────────────────────────────────</p>
+<p class="p1">function App(){</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [tab,setTab]=useState("patients");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [patients,setPatients]=useState(loadP);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [selPt,setSelPt]=useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [activeScale,setActiveScale]=useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [showNew,setShowNew]=useState(false);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [newName,setNewName]=useState("");const [newAge,setNewAge]=useState("");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [view,setView]=useState("list");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [diagCat,setDiagCat]=useState("Todos");const [diagSearch,setDiagSearch]=useState("");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [expDx,setExpDx]=useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [glossSearch,setGlossSearch]=useState("");</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const [fVals,setFVals]=useState({});const [fRes,setFRes]=useState({});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function addPt(){if(!newName.trim())return;const p={id:Date.now(),name:newName.trim(),age:newAge,evaluations:[],createdAt:new Date().toISOString()};const u=[...patients,p];setPatients(u);saveP(u);setNewName("");setNewAge("");setShowNew(false);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function handleScaleDone(result){const u=patients.map(p=&gt;{if(p.id!==selPt.id)return p;return{...p,evaluations:[...(p.evaluations||[]),result]};});setPatients(u);saveP(u);setSelPt(u.find(p=&gt;p.id===selPt.id));setView("report");setActiveScale(null);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const fDx=DX.filter(d=&gt;(diagCat==="Todos"||d.cat===diagCat)&amp;&amp;(!diagSearch||d.name.toLowerCase().includes(diagSearch.toLowerCase())));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const fGlos=GLOS.filter(g=&gt;!glossSearch||g.t.toLowerCase().includes(glossSearch.toLowerCase())||g.d.toLowerCase().includes(glossSearch.toLowerCase()));</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function calcF(fid){const f=FORMULAS.find(x=&gt;x.id===fid);const r=f.calc(fVals[fid]||{});setFRes({...fRes,[fid]:r});}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const TABS=[{id:"patients",label:"Pacientes",icon:"ti-users"},{id:"scales",label:"Escalas",icon:"ti-clipboard-list"},{id:"diagnostics",label:"Diagnósticos",icon:"ti-stethoscope"},{id:"tccd",label:"TCC-I",icon:"ti-brain"},{id:"formulas",label:"Fórmulas",icon:"ti-calculator"},{id:"glossary",label:"Glosario",icon:"ti-book"}];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>return(</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div style={{fontFamily:"var(--font-sans)",color:"#1a1a2e",maxWidth:720,margin:"0 auto"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{display:"flex",alignItems:"center",gap:10,padding:"1rem 0 0.5rem",borderBottom:"0.5px solid #e0e0ee",marginBottom:"1rem"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{width:36,height:36,borderRadius:10,background:BRAND,display:"flex",alignItems:"center",justifyContent:"center"}}&gt;&lt;i className="ti ti-moon" style={{color:"#fff",fontSize:18}}&gt;&lt;/i&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;&lt;h1 style={{fontSize:20,fontWeight:500,margin:0,letterSpacing:-0.3}}&gt;NapIQ&lt;/h1&gt;&lt;p style={{fontSize:11,color:"#555577",margin:0}}&gt;Plataforma clínico-diagnóstica · ICSD-3 TR · DSM-5-TR · Furukawa 2024&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style={{display:"flex",gap:0,marginBottom:"1.25rem",borderBottom:"0.5px solid #e0e0ee",overflowX:"auto"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{TABS.map(t=&gt;(&lt;button key={t.id} onClick={()=&gt;{setTab(t.id);setView("list");setActiveScale(null);}} style={{padding:"8px 11px",fontSize:12,border:"none",borderBottom:tab===t.id?`2px solid ${BRAND}`:"2px solid transparent",background:"none",color:tab===t.id?BRAND:"#555577",cursor:"pointer",fontWeight:tab===t.id?500:400,display:"flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}}&gt;&lt;i className={`ti ${t.icon}`} style={{fontSize:14}}&gt;&lt;/i&gt;{t.label}&lt;/button&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="patients"&amp;&amp;view==="list"&amp;&amp;(&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h2 style={{fontSize:16,fontWeight:500,margin:0}}&gt;Pacientes&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onClick={()=&gt;setShowNew(true)} style={{padding:"7px 14px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",cursor:"pointer",display:"flex",alignItems:"center",gap:5}}&gt;&lt;i className="ti ti-plus" style={{fontSize:14}}&gt;&lt;/i&gt;Nuevo paciente&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{showNew&amp;&amp;(&lt;div style={{padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee",marginBottom:"1rem"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:14,fontWeight:500,marginBottom:10}}&gt;Nuevo paciente&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",gap:8,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input value={newName} onChange={e=&gt;setNewName(e.target.value)} placeholder="Nombre completo" style={{flex:2,minWidth:160,padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e"}} onKeyDown={e=&gt;e.key==="Enter"&amp;&amp;addPt()}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input value={newAge} onChange={e=&gt;setNewAge(e.target.value)} placeholder="Edad" type="number" style={{flex:1,minWidth:70,padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e"}}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button onClick={addPt} style={{padding:"7px 14px",fontSize:13,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer"}}&gt;Agregar&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button onClick={()=&gt;setShowNew(false)} style={{padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",cursor:"pointer"}}&gt;Cancelar&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{patients.length===0&amp;&amp;&lt;p style={{fontSize:14,color:"#999",textAlign:"center",padding:"2.5rem 0"}}&gt;Sin pacientes registrados. Agrega el primero.&lt;/p&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{patients.map(pt=&gt;(&lt;div key={pt.id} onClick={()=&gt;{setSelPt(pt);setView("report");}} style={{padding:"0.875rem 1rem",background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee",marginBottom:8,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",alignItems:"center",gap:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{width:38,height:38,borderRadius:"50%",background:BRAND_LIGHT,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:500,color:BRAND_MID}}&gt;{pt.name.split(" ").map(n=&gt;n[0]).join("").slice(0,2).toUpperCase()}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;&lt;p style={{fontSize:14,fontWeight:500,margin:0}}&gt;{pt.name}&lt;/p&gt;&lt;p style={{fontSize:12,color:"#555577",margin:0}}&gt;{pt.age?`${pt.age} años · `:""}{pt.evaluations?.length||0} evaluaciones&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i className="ti ti-chevron-right" style={{color:"#999",fontSize:18}}&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="patients"&amp;&amp;view==="report"&amp;&amp;selPt&amp;&amp;&lt;PatientReport patient={selPt} onBack={()=&gt;setView("list")} onStartTCCI={()=&gt;setView("tcci")} onScaleSelect={s=&gt;{setActiveScale(s);setView("scale");}}/&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="patients"&amp;&amp;view==="tcci"&amp;&amp;selPt&amp;&amp;&lt;TCCIPlan patient={selPt} onBack={()=&gt;setView("report")}/&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="patients"&amp;&amp;view==="scale"&amp;&amp;activeScale&amp;&amp;&lt;ScaleForm scale={activeScale} onComplete={handleScaleDone} onBack={()=&gt;{setView("report");setActiveScale(null);}}/&gt;}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="scales"&amp;&amp;(&lt;div&gt;{!activeScale?(&lt;&gt;&lt;h2 style={{fontSize:16,fontWeight:500,marginBottom:"1rem"}}&gt;Escalas validadas&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{Object.values(SCALES).map(s=&gt;(&lt;div key={s.id} style={{padding:"0.875rem 1rem",background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee",marginBottom:8,cursor:"pointer"}} onClick={()=&gt;setActiveScale(s)}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div&gt;&lt;p style={{fontSize:14,fontWeight:500,margin:"0 0 3px"}}&gt;{s.name}&lt;/p&gt;&lt;p style={{fontSize:12,color:"#555577",margin:0}}&gt;{s.desc}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;i className="ti ti-chevron-right" style={{color:"#999",fontSize:18,marginLeft:8}}&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;))}&lt;/&gt;):(&lt;ScaleForm scale={activeScale} onComplete={()=&gt;setActiveScale(null)} onBack={()=&gt;setActiveScale(null)}/&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="diagnostics"&amp;&amp;(&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}&gt;Diagnósticos — ICSD-3 TR · DSM-5-TR&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:"1rem"}}&gt;{DX.length} patologías con criterios, escalas y nivel de evidencia.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input value={diagSearch} onChange={e=&gt;setDiagSearch(e.target.value)} placeholder="Buscar patología..." style={{width:"100%",padding:"8px 12px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e",marginBottom:"0.75rem"}}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:"1rem"}}&gt;{DIAG_CATS.map(c=&gt;(&lt;button key={c} onClick={()=&gt;setDiagCat(c)} style={{padding:"4px 12px",fontSize:12,borderRadius:20,border:diagCat===c?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:diagCat===c?BRAND_LIGHT:"#fff",color:diagCat===c?BRAND_MID:"#555577",cursor:"pointer",fontWeight:diagCat===c?500:400}}&gt;{c}&lt;/button&gt;))}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{fDx.map(d=&gt;(&lt;div key={d.id} style={{marginBottom:8,borderRadius:10,border:"0.5px solid #e0e0ee",overflow:"hidden"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div onClick={()=&gt;setExpDx(expDx===d.id?null:d.id)} style={{padding:"0.875rem 1rem",background:"#fff",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{flex:1}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;p style={{fontSize:14,fontWeight:500,margin:0}}&gt;{d.name}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:BRAND_LIGHT,color:BRAND_MID}}&gt;{d.cat}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:PC[d.evidence]+"22",color:PC[d.evidence]}}&gt;Evidencia {d.evidence}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:12,color:"#555577",margin:"3px 0 0"}}&gt;{d.def}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;i className={`ti ${expDx===d.id?"ti-chevron-up":"ti-chevron-down"}`} style={{color:"#999",fontSize:16,marginLeft:8,flexShrink:0}}&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{expDx===d.id&amp;&amp;(&lt;div style={{padding:"0 1rem 1rem",background:"#f4f4f8",borderTop:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{marginTop:"0.875rem",display:"grid",gap:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{padding:"0.75rem",background:"#fff",borderRadius:8,borderLeft:`3px solid ${BRAND}`}}&gt;&lt;p style={{fontSize:12,fontWeight:500,color:BRAND_MID,margin:"0 0 4px"}}&gt;Criterios ICSD-3 TR&lt;/p&gt;&lt;p style={{fontSize:13,margin:0,lineHeight:1.6}}&gt;{d.icsd}&lt;/p&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{d.dsm&amp;&amp;&lt;div style={{padding:"0.75rem",background:"#fff",borderRadius:8,borderLeft:`3px solid ${GREEN}`}}&gt;&lt;p style={{fontSize:12,fontWeight:500,color:"#0F6E56",margin:"0 0 4px"}}&gt;DSM-5-TR&lt;/p&gt;&lt;p style={{fontSize:13,margin:0,lineHeight:1.6}}&gt;{d.dsm}&lt;/p&gt;&lt;/div&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div style={{display:"flex",gap:8,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{flex:1,minWidth:140,padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}&gt;&lt;p style={{fontSize:12,fontWeight:500,margin:"0 0 6px",color:"#555577"}}&gt;Escalas&lt;/p&gt;&lt;div style={{display:"flex",flexWrap:"wrap",gap:4}}&gt;{d.scales.map(s=&gt;&lt;span key={s} style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:BRAND_LIGHT,color:BRAND_MID}}&gt;{s}&lt;/span&gt;)}&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;div style={{flex:1,minWidth:140,padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}&gt;&lt;p style={{fontSize:12,fontWeight:500,margin:"0 0 6px",color:"#555577"}}&gt;Señales de alarma&lt;/p&gt;{d.alarms.map((a,i)=&gt;&lt;p key={i} style={{fontSize:12,margin:"2px 0",color:RED}}&gt;• {a}&lt;/p&gt;)}&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:11,color:"#999",margin:0}}&gt;Ref: {d.ref}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="tccd"&amp;&amp;(&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}&gt;TCC-I — Evidencia y componentes&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{padding:"0.875rem 1rem",background:BRAND_LIGHT,borderRadius:10,marginBottom:"1.25rem",border:`0.5px solid #AFA9EC`}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,fontWeight:500,color:BRAND_MID,margin:"0 0 4px"}}&gt;Paquete óptimo — Furukawa et al. JAMA Psychiatry 2024&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:12,color:BRAND,margin:0}}&gt;cNMA · 241 ensayos · 31,452 participantes · Reestructuración cognitiva (1.68) · Tercera ola (1.49) · Restricción del sueño (1.49) · Control de estímulos (1.43) · Presencial (1.83)&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{[{title:"Reestructuración cognitiva",ior:"1.68",col:BRAND,badge:"Mayor beneficio en remisión",desc:"Identifica y desafía creencias disfuncionales. Mejora calidad subjetiva y remisión a largo plazo."},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{title:"Restricción del sueño",ior:"1.49",col:BRAND,badge:"Mejora eficiencia y WASO",desc:"Ventana = TTS promedio + 30 min. Ajuste semanal por ES. Reduce WASO (iMD −7 min)."},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{title:"Tercera ola (Mindfulness/ACT)",ior:"1.49",col:BRAND,badge:"Aceptación",desc:"Mecanismo de aceptación, no de control. Atenúa la lucha contra el insomnio."},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{title:"Control de estímulos",ior:"1.43",col:BRAND,badge:"Mejora latencia y eficiencia",desc:"5 reglas de Bootzin + regla de los 20 min. Mejora latencia (iMD −7 min)."},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{title:"Formato presencial",ior:"1.83",col:GREEN,badge:"Formato óptimo",desc:"Formato más eficaz. Autoayuda con apoyo humano no fue significativamente inferior."},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{title:"Higiene del sueño (aislada)",ior:"1.01",col:GRAY,badge:"Sin beneficio incremental",desc:"Sin beneficio como componente aislado. Contexto educativo únicamente."},</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{title:"Relajación",ior:"0.81",col:RED,badge:"Potencialmente contraproducente",desc:"Puede contrarrestar restricción del sueño y control de estímulos. Excluida del paquete óptimo."},</p>
+<p class="p1"><span class="Apple-converted-space">        </span>].map((c,i)=&gt;(&lt;div key={i} style={{marginBottom:10,padding:"1rem",background:"#f4f4f8",borderRadius:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6,marginBottom:6}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:14,fontWeight:500,margin:0}}&gt;{c.title}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{display:"flex",gap:6}}&gt;&lt;span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:c.col+"22",color:c.col}}&gt;iOR {c.ior}&lt;/span&gt;&lt;span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:c.col+"15",color:c.col}}&gt;{c.badge}&lt;/span&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,color:"#555577",margin:0,lineHeight:1.6}}&gt;{c.desc}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div style={{marginTop:"1rem",padding:"0.875rem 1rem",background:BRAND_LIGHT,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:13,color:BRAND_MID,margin:0}}&gt;El plan TCC-I sesión a sesión se genera en el expediente de cada paciente.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onClick={()=&gt;setTab("patients")} style={{padding:"7px 14px",fontSize:12,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer"}}&gt;Ir a pacientes ↗&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="formulas"&amp;&amp;(&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}&gt;Calculadoras clínicas&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:"1.25rem"}}&gt;Fórmulas para el cálculo e interpretación clínica de parámetros del sueño.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{FORMULAS.map(f=&gt;{const vals=fVals[f.id]||{};const res=fRes[f.id];return(&lt;div key={f.id} style={{marginBottom:14,padding:"1rem 1.25rem",background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:14,fontWeight:500,margin:"0 0 4px"}}&gt;{f.name}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p style={{fontSize:12,color:"#555577",margin:"0 0 12px",lineHeight:1.5}}&gt;{f.desc}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:10}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>{f.fields.map(field=&gt;(&lt;div key={field.id}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;p style={{fontSize:11,color:"#555577",margin:"0 0 4px"}}&gt;{field.label}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;input placeholder={field.ph} value={vals[field.id]||""} onChange={e=&gt;setFVals({...fVals,[f.id]:{...vals,[field.id]:e.target.value}})}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>style={{width:"100%",padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#f4f4f8",color:"#1a1a2e"}}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onClick={()=&gt;calcF(f.id)} style={{padding:"7px 18px",fontSize:13,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer",marginBottom:res?"12px":0}}&gt;Calcular&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>{res&amp;&amp;(&lt;div style={{padding:"1rem",background:"#f4f4f8",borderRadius:8,border:`1.5px solid ${BRAND}`}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div style={{display:"flex",alignItems:"baseline",gap:6,marginBottom:8}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span style={{fontSize:26,fontWeight:500,color:BRAND}}&gt;{res.value}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>{res.unit&amp;&amp;&lt;span style={{fontSize:13,color:"#555577"}}&gt;{res.unit}&lt;/span&gt;}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style={{fontSize:12,color:"#555577",margin:0,lineHeight:1.7,whiteSpace:"pre-wrap"}}&gt;{res.interp}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;);})}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>{tab==="glossary"&amp;&amp;(&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}&gt;Glosario de medicina del sueño&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p style={{fontSize:13,color:"#555577",marginBottom:"1rem"}}&gt;{GLOS.length} términos clínicos basados en ICSD-3 TR, AASM y literatura indexada.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input value={glossSearch} onChange={e=&gt;setGlossSearch(e.target.value)} placeholder="Buscar término..." style={{width:"100%",padding:"8px 12px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e",marginBottom:"1rem"}}/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>{fGlos.map((g,i)=&gt;(&lt;div key={i} style={{padding:"0.75rem 1rem",marginBottom:6,background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee",display:"flex",gap:12,alignItems:"flex-start"}}&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span style={{fontSize:13,fontWeight:500,color:BRAND,minWidth:90,flexShrink:0}}&gt;{g.t}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span style={{fontSize:13,color:"#555577",lineHeight:1.6}}&gt;{g.d}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;))}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;)}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>);</p>
+<p class="p1">}</p>
+<p class="p2"><br></p>
+<p class="p1">function mountApp(){ReactDOM.createRoot(document.getElementById("app-root")).render(React.createElement(App));}</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
