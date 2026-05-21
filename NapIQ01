@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NapIQ — Medicina del Sueño</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f4f8;color:#1a1a2e;min-height:100vh;}
+  :root{
+    --color-text-primary:#1a1a2e;
+    --color-text-secondary:#555577;
+    --color-text-tertiary:#999;
+    --color-background-primary:#ffffff;
+    --color-background-secondary:#f4f4f8;
+    --color-border-tertiary:#e0e0ee;
+    --color-border-secondary:#c8c8dd;
+    --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#2d2880 0%,#534AB7 60%,#7b72e8 100%);}
+  #app-root{max-width:760px;margin:0 auto;padding:16px;}
+  input,button{font-family:inherit;}
+  input:focus{outline:2px solid #534AB7;outline-offset:1px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div style="background:#fff;border-radius:16px;padding:40px 36px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,0.18);text-align:center;">
+    <div style="width:52px;height:52px;background:#534AB7;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <i class="ti ti-moon" style="color:#fff;font-size:26px;"></i>
+    </div>
+    <h1 style="font-size:24px;font-weight:600;color:#1a1a2e;margin-bottom:4px;">NapIQ</h1>
+    <p style="font-size:13px;color:#777;margin-bottom:28px;">Plataforma clínico-diagnóstica de medicina del sueño</p>
+    <input id="pwd-input" type="password" placeholder="Contraseña de acceso"
+      style="width:100%;padding:11px 14px;font-size:14px;border-radius:10px;border:1.5px solid #e0e0ee;margin-bottom:12px;"/>
+    <button onclick="checkLogin()"
+      style="width:100%;padding:11px;font-size:14px;font-weight:600;border-radius:10px;border:none;background:#534AB7;color:#fff;cursor:pointer;">
+      Entrar
+    </button>
+    <p id="login-err" style="color:#A32D2D;font-size:12px;margin-top:10px;display:none;">Contraseña incorrecta.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-root" style="display:none;"></div>
+
+<script>
+function checkLogin(){
+  const val=document.getElementById("pwd-input").value;
+  const err=document.getElementById("login-err");
+  if(val==="NapIQ2202"){
+    document.getElementById("login-screen").style.display="none";
+    document.getElementById("app-root").style.display="block";
+    if(!window.__napiqMounted){window.__napiqMounted=true;mountApp();}
+  } else {
+    err.style.display="block";
+    document.getElementById("pwd-input").value="";
+    document.getElementById("pwd-input").focus();
+  }
+}
+document.getElementById("pwd-input").addEventListener("keydown",e=>{if(e.key==="Enter")checkLogin();});
+</script>
+
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+
+// ── STORAGE ───────────────────────────────────────────────────────────────────
+function loadP(){try{const d=localStorage.getItem("napiq_pts");return d?JSON.parse(d):[];}catch{return[];}}
+function saveP(pts){try{localStorage.setItem("napiq_pts",JSON.stringify(pts));}catch{}}
+
+// ── PDF HELPERS ───────────────────────────────────────────────────────────────
+const BRAND="#534AB7",BRAND_LIGHT="#EEEDFE",BRAND_MID="#3C3489";
+const GREEN="#1D9E75",AMBER="#BA7517",RED="#A32D2D",GRAY="#888780";
+function hexToRgb(h){return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];}
+function pdfSetColor(doc,hex,type="fill"){const[r,g,b]=hexToRgb(hex);type==="fill"?doc.setFillColor(r,g,b):doc.setTextColor(r,g,b);}
+function pdfHeader(doc,title,sub,name,date){
+  const W=doc.internal.pageSize.getWidth();
+  pdfSetColor(doc,BRAND,"fill");doc.rect(0,0,W,22,"F");
+  doc.setFontSize(16);doc.setFont("helvetica","bold");pdfSetColor(doc,"#ffffff","text");doc.text("NapIQ",14,14);
+  doc.setFontSize(9);doc.setFont("helvetica","normal");doc.text("Plataforma clínico-diagnóstica de medicina del sueño",52,10);
+  doc.text(`Paciente: ${name}   |   Fecha: ${date}`,52,16);
+  pdfSetColor(doc,BRAND_LIGHT,"fill");doc.rect(0,22,W,16,"F");
+  doc.setFontSize(13);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(title,14,33);
+  if(sub){doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,BRAND,"text");doc.text(sub,14,39);}
+  return sub?44:40;
+}
+function pdfFooter(doc,p,t){
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  pdfSetColor(doc,BRAND,"fill");doc.rect(0,H-10,W,10,"F");
+  doc.setFontSize(7);doc.setFont("helvetica","normal");pdfSetColor(doc,"#ffffff","text");
+  doc.text("NapIQ — Medicina del sueño basada en evidencia · ICSD-3 TR · DSM-5-TR",14,H-3.5);
+  doc.text(`Página ${p} de ${t}`,W-30,H-3.5);
+}
+function pdfSectionTitle(doc,text,y){
+  pdfSetColor(doc,BRAND,"fill");doc.rect(14,y,4,6,"F");
+  doc.setFontSize(11);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(text,20,y+5);
+  return y+10;
+}
+function pdfWrapped(doc,text,x,y,maxW,fs=10,color="#333333"){
+  doc.setFontSize(fs);doc.setFont("helvetica","normal");pdfSetColor(doc,color,"text");
+  const lines=doc.splitTextToSize(text,maxW);doc.text(lines,x,y);
+  return y+lines.length*(fs*0.45+1.2)+2;
+}
+function pdfScoreBar(doc,name,score,max,color,x,y,bW){
+  doc.setFontSize(8);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(name,x,y);
+  pdfSetColor(doc,"#E8E8E8","fill");doc.roundedRect(x,y+2,bW,6,1,1,"F");
+  const filled=Math.max(3,(score/max)*bW);const[r,g,b]=hexToRgb(color);
+  doc.setFillColor(r,g,b);doc.roundedRect(x,y+2,filled,6,1,1,"F");
+  doc.setFontSize(8);doc.setFont("helvetica","bold");pdfSetColor(doc,color,"text");doc.text(`${score}/${max}`,x+bW+3,y+7);
+  return y+12;
+}
+function pdfCircle(doc,score,max,color,cx,cy,r){
+  pdfSetColor(doc,"#E8E8E8","fill");doc.circle(cx,cy,r,"F");
+  const steps=Math.round((score/max)*36);const[cr,cg,cb]=hexToRgb(color);doc.setFillColor(cr,cg,cb);
+  for(let i=0;i<steps;i++){const a1=(i/36)*2*Math.PI-Math.PI/2,a2=((i+1)/36)*2*Math.PI-Math.PI/2;
+    doc.triangle(cx,cy,cx+r*Math.cos(a1),cy+r*Math.sin(a1),cx+r*Math.cos(a2),cy+r*Math.sin(a2),"F");}
+  doc.setFillColor(255,255,255);doc.circle(cx,cy,r*0.62,"F");
+  doc.setFontSize(10);doc.setFont("helvetica","bold");pdfSetColor(doc,color,"text");
+  doc.text(`${score}`,cx-(score>=10?3:1.5),cy+1.5);
+  doc.setFontSize(6);doc.setFont("helvetica","normal");pdfSetColor(doc,GRAY,"text");doc.text(`/${max}`,cx+2,cy+4);
+}
+
+async function generatePatientReportPDF(patient,aiReport){
+  const JsPDF=window.jspdf.jsPDF;
+  const doc=new JsPDF({unit:"mm",format:"a4"});
+  const W=doc.internal.pageSize.getWidth();
+  const today=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
+  const le={};patient.evaluations?.forEach(e=>{le[e.scaleId]=e;});
+  const scaleInfo={
+    psqi:{friendly:"Calidad de tu sueño",labelFn:v=>v<=5?"Tu sueño es de buena calidad":v<=10?"Tu sueño tiene algunas dificultades":"Tu sueño está pasando por un momento difícil",tip:"Este resultado refleja cómo ha sido tu sueño en el último mes, tomando en cuenta qué tan rápido te duermes, si te despiertas en la noche y cómo te sientes al día siguiente."},
+    ess:{friendly:"Somnolencia durante el día",labelFn:v=>v<=10?"Tu nivel de somnolencia es normal":v<=12?"Tienes un poco más de somnolencia de lo usual":v<=17?"Tu somnolencia durante el día es elevada":"Tu somnolencia es muy alta — es importante evaluarla",tip:"Este resultado nos dice qué tanta probabilidad tienes de quedarte dormido/a en situaciones cotidianas. Un resultado alto puede indicar que tu sueño nocturno no está siendo reparador."},
+    stopbang:{friendly:"Riesgo de apnea del sueño",labelFn:v=>v<=2?"Tu riesgo de apnea del sueño es bajo":v<=4?"Tienes un riesgo intermedio de apnea del sueño":"Tu riesgo de apnea del sueño es alto — se recomienda evaluación",tip:"La apnea del sueño ocurre cuando la respiración se interrumpe brevemente durante el sueño. Este cuestionario ayuda a identificar personas que podrían beneficiarse de un estudio de sueño."},
+    isi:{friendly:"Severidad de tu insomnio",labelFn:v=>v<=7?"No tienes insomnio clínicamente significativo":v<=14?"Tienes insomnio leve — hay estrategias muy efectivas para manejarlo":v<=21?"Tu insomnio es moderado — el tratamiento puede ayudarte mucho":"Tu insomnio es severo — es importante que recibas tratamiento",tip:"El insomnio es una de las condiciones más tratables en medicina del sueño. La TCC-I tiene una efectividad superior al 80% en la remisión del insomnio crónico."},
+    irls:{friendly:"Síndrome de piernas inquietas",labelFn:v=>v===0?"No presentas síntomas significativos":v<=10?"Tus síntomas son leves":v<=20?"Tus síntomas son moderados":v<=30?"Tus síntomas son severos":"Tus síntomas son muy severos",tip:"El síndrome de piernas inquietas es una condición neurológica con tratamientos muy efectivos disponibles."},
+  };
+  let y=pdfHeader(doc,"Reporte de sueño personalizado","Resumen de tu evaluación y próximos pasos",patient.name,today);
+  y+=4;
+  y=pdfWrapped(doc,`Hola ${patient.name.split(" ")[0]}, este reporte resume los resultados de tu evaluación de sueño. Está escrito en un lenguaje sencillo para que puedas entender cómo está tu sueño en este momento y qué podemos hacer juntos para mejorarlo.`,14,y,W-28,10,"#333333");
+  y+=4;y=pdfSectionTitle(doc,"Tus resultados",y);
+  const evals=Object.values(le);
+  if(evals.length>0){
+    const cR=10;const cSp=(W-28)/Math.min(evals.length,4);
+    evals.slice(0,4).forEach((e,i)=>{
+      const si=scaleInfo[e.scaleId];if(!si)return;
+      const col=e.risk==="bajo"?GREEN:e.risk==="moderado"?AMBER:RED;
+      const cx=14+cSp*i+cR+4;
+      pdfCircle(doc,e.score,e.max,col,cx,y+cR,cR);
+      doc.setFontSize(7);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");
+      const nm=doc.splitTextToSize(si.friendly,cSp-4);doc.text(nm,cx-(cSp/2-6),y+cR*2+5);
+    });
+    y+=cR*2+16;
+    evals.forEach(e=>{
+      const si=scaleInfo[e.scaleId];if(!si)return;
+      const col=e.risk==="bajo"?GREEN:e.risk==="moderado"?AMBER:RED;
+      if(y>240){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,"Reporte de sueño personalizado","(continuación)",patient.name,today)+4;}
+      pdfSetColor(doc,"#F9F9FF","fill");doc.roundedRect(14,y,W-28,28,2,2,"F");
+      const[r,g,b]=hexToRgb(col);doc.setFillColor(r,g,b);doc.roundedRect(14,y,3,28,1,1,"F");
+      let cy2=pdfScoreBar(doc,si.friendly,e.score,e.max,col,20,y+5,W-60)+2;
+      doc.setFontSize(9);doc.setFont("helvetica","bold");pdfSetColor(doc,col,"text");doc.text(si.labelFn(e.score),20,cy2);cy2+=5;
+      doc.setFontSize(8);doc.setFont("helvetica","normal");pdfSetColor(doc,"#555555","text");
+      const tl=doc.splitTextToSize(si.tip,W-36);doc.text(tl,20,cy2);
+      y+=28+4;
+    });
+  }
+  if(aiReport&&aiReport.length>10){
+    if(y>210){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,"Reporte de sueño personalizado","Lo que dice tu médico",patient.name,today)+4;}
+    y=pdfSectionTitle(doc,"Lo que dice tu médico",y);
+    pdfSetColor(doc,"#F9F9FF","fill");doc.roundedRect(14,y,W-28,8,"F");
+    doc.setFontSize(8);doc.setFont("helvetica","italic");pdfSetColor(doc,BRAND,"text");doc.text("El siguiente resumen fue elaborado por tu especialista en medicina del sueño:",17,y+5);y+=11;
+    y=pdfWrapped(doc,aiReport,14,y,W-28,9,"#333333");
+  }
+  if(y>230){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,"Reporte de sueño personalizado","Próximos pasos",patient.name,today)+4;}
+  y+=4;y=pdfSectionTitle(doc,"Próximos pasos",y);
+  ["Acude a tu próxima consulta con este reporte en mano.","Si te recetaron un plan de TCC-I, sigue las instrucciones de cada semana al pie de la letra.","Registra tu sueño cada mañana en tu diario de sueño — es la herramienta más importante del tratamiento.","Si tienes dudas o algo cambia, no esperes a tu próxima cita para comentarlo con tu médico.","Recuerda: el insomnio tiene tratamiento efectivo. Con constancia, los resultados llegan."].forEach((s,i)=>{
+    pdfSetColor(doc,BRAND,"fill");doc.circle(17,y-1,2,"F");
+    doc.setFontSize(9);pdfSetColor(doc,"#ffffff","text");doc.text(`${i+1}`,16,y);
+    doc.setFontSize(9);pdfSetColor(doc,"#333333","text");
+    const ls=doc.splitTextToSize(s,W-34);doc.text(ls,21,y);y+=ls.length*5+3;
+  });
+  const tp=doc.internal.pages.length-1;for(let p=1;p<=tp;p++){doc.setPage(p);pdfFooter(doc,p,tp);}
+  doc.save(`NapIQ_Reporte_${patient.name.replace(/ /g,"_")}_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+
+async function generateSessionPDF(patient,session){
+  const JsPDF=window.jspdf.jsPDF;
+  const doc=new JsPDF({unit:"mm",format:"a4"});
+  const W=doc.internal.pageSize.getWidth();
+  const today=new Date().toLocaleDateString("es-MX",{year:"numeric",month:"long",day:"numeric"});
+  const titles={1:"Semana 1 — Entendiendo tu sueño",2:"Semana 2 — Regulando tu tiempo de sueño",3:"Semana 3 — Reconectando la cama con el sueño",4:"Semana 4 — Cambiando la forma en que piensas sobre el sueño",5:"Semana 5 — Desafiando los pensamientos difíciles",6:"Semana 6 — Aprendiendo a soltar la lucha",7:"Semana 7 — Consolidando tus avances",8:"Semana 8 — Manteniendo lo que lograste"};
+  const intros={1:`Hola ${patient.name.split(" ")[0]}! Esta semana comenzamos juntos un camino para mejorar tu sueño. No se trata de hacer grandes cambios de un día para otro — se trata de entender cómo funciona tu sueño y empezar a observarlo con curiosidad, sin juicio.`,2:`¡Bienvenido/a a tu segunda semana! Esta semana ajustaremos el tiempo que pasas en cama. Puede sonar extraño, pero pasar MENOS tiempo en cama al principio es lo que hará que tu sueño se vuelva más profundo y continuo. ¡Confía en el proceso!`,3:`¡Vas muy bien! Esta semana añadimos una herramienta fundamental: aprender a usar la cama SOLO para dormir. Tu cerebro ha aprendido a asociar la cama con estar despierto/a y preocupado/a — esta semana empezamos a cambiar eso.`,4:`Esta semana llegamos al corazón del tratamiento: lo que piensas sobre el sueño. Los pensamientos negativos sobre el insomnio lo mantienen vivo. Esta semana empezarás a identificarlos — ¡sin juzgarte!`,5:`Esta semana aprenderás a cuestionar esos pensamientos difíciles y reemplazarlos por otros más útiles. No se trata de "pensar positivo" — se trata de pensar con más precisión y compasión hacia ti mismo/a.`,6:`Esta semana exploramos una forma diferente de relacionarte con el insomnio: en lugar de luchar contra él, aprender a observarlo y aceptarlo. Esto no significa resignarse — significa quitarle el poder que tiene sobre ti.`,7:`¡Estás en la recta final! Esta semana revisamos todo lo que has aprendido y construimos tu plan personal para mantener los avances.`,8:`¡Lo lograste! Esta sesión es tu revisión de mantenimiento. Vamos a ver cómo estás y asegurarnos de que tienes todo para seguir durmiendo bien.`};
+  const motivations={1:"¡Un paso a la vez! Observar tu sueño esta semana es todo lo que necesitas hacer.",2:"La somnolencia la primera semana es normal — es señal de que el tratamiento está funcionando.",3:"Recuerda: levantarte de la cama cuando no puedes dormir no es rendirse — es la clave para mejorar.",4:"Identificar un pensamiento difícil ya es un gran avance. No te juzgues — solo observa.",5:"No se trata de pensar positivo, sino de pensar con más precisión. ¡Tú puedes!",6:"Soltar la lucha no es rendirse — es la forma más inteligente de ganar.",7:"Ya tienes las herramientas. Ahora es momento de confiar en ti mismo/a.",8:"¡Felicidades por llegar hasta aquí! Tu compromiso con mejorar tu sueño es admirable."};
+  const ft=titles[session.n]||`Semana ${session.n}`;
+  let y=pdfHeader(doc,ft,`Plan semanal para ${patient.name.split(" ")[0]}`,patient.name,today);y+=4;
+  pdfSetColor(doc,BRAND_LIGHT,"fill");doc.roundedRect(14,y,W-28,24,2,2,"F");
+  doc.setFontSize(10);doc.setFont("helvetica","normal");pdfSetColor(doc,BRAND_MID,"text");
+  const il=doc.splitTextToSize(intros[session.n]||`Esta semana trabajaremos en: ${session.focus}`,W-34);
+  doc.text(il,18,y+7);y+=Math.max(26,il.length*5+8);y+=4;
+  if(session.content?.length>0){
+    y=pdfSectionTitle(doc,"Tus instrucciones para esta semana",y);
+    const fh={"Modelo 3P de Spielman":"¿Por qué te quedas sin dormir? El ciclo del insomnio","Cómo usar el Diario de Sueño":"Tu diario de sueño — cómo llenarlo cada mañana","Cómo calcular la ventana de sueño inicial":"Tu horario de sueño personalizado","Protocolo de titulación semanal":"Cómo ajustamos tu horario semana a semana","Las 5 reglas de control de estímulos (Bootzin, 1972)":"Tus 5 reglas para esta semana","Manejo de resistencias comunes":"Respuestas a tus posibles dudas","Modelo cognitivo del insomnio (Harvey, 2002)":"¿Cómo los pensamientos mantienen el insomnio?","Técnica: Registro de 3 columnas":"Tu ejercicio de la semana","Cuestionamiento socrático — 5 preguntas clave":"Las 5 preguntas para cuestionar tus pensamientos","Paradoja del control del sueño":"¿Por qué esforzarte por dormir lo empeora?","Diferencia conceptual: control vs aceptación":"Una nueva forma de ver el insomnio","Defusión cognitiva":"Observar tus pensamientos desde lejos","Mindfulness pre-sueño (5-10 min)":"Tu práctica de mindfulness esta semana","Revisión de progreso":"Revisando cuánto has avanzado","Plan personal de mantenimiento":"Tu plan personal para seguir durmiendo bien","Evaluación de mantenimiento":"Cómo está tu sueño ahora"};
+    session.content.forEach((c,ci)=>{
+      if(y>240){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"(continuación)",patient.name,today)+8;}
+      doc.setFontSize(10);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");
+      doc.text(`${ci+1}. ${fh[c.heading]||c.heading}`,14,y);y+=6;
+      const fb=c.body.replace(/TTS/g,"horas dormidas").replace(/\bTEC\b/g,"tiempo en cama").replace(/\bES\b/g,"eficiencia del sueño").replace(/WASO/g,"tiempo despierto en la noche").replace(/hiperarousal/g,"estado de alerta elevada").replace(/iOR[\s\d.]+/g,"").replace(/IC 95%[^)]+\)/g,"").replace(/Furukawa[^.]+\./g,"").replace(/Harvey[^.]+\./g,"").replace(/Bootzin[^,]+,/g,"").replace(/Borbely[^.]+\./g,"").trim();
+      const bl=doc.splitTextToSize(fb,W-28);
+      doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,"#333333","text");
+      let li=0;
+      while(li<bl.length){
+        if(y>255){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"(continuación)",patient.name,today)+8;}
+        const chunk=bl.slice(li,li+12);doc.text(chunk,14,y);y+=chunk.length*4.5;li+=12;
+      }
+      y+=4;
+    });
+  }
+  if(session.tarea){
+    if(y>230){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"Tu tarea",patient.name,today)+8;}
+    y+=2;pdfSetColor(doc,BRAND,"fill");doc.roundedRect(14,y,W-28,8,2,2,"F");
+    doc.setFontSize(10);doc.setFont("helvetica","bold");pdfSetColor(doc,"#ffffff","text");doc.text("Tu tarea de esta semana",17,y+5.5);y+=10;
+    pdfSetColor(doc,BRAND_LIGHT,"fill");doc.roundedRect(14,y,W-28,30,2,2,"F");
+    doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,BRAND_MID,"text");
+    const tl=doc.splitTextToSize(session.tarea.replace(/TTS/g,"horas dormidas").replace(/\bTEC\b/g,"tiempo en cama").replace(/\bES\b/g,"eficiencia del sueño"),W-32);
+    doc.text(tl,17,y+6);y+=Math.max(32,tl.length*4.5+8);
+  }
+  // Diario for sessions 1-2
+  if(session.n<=2){
+    if(y>180){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=pdfHeader(doc,ft,"Diario de sueño",patient.name,today)+8;}
+    y+=4;y=pdfSectionTitle(doc,"Tu diario de sueño — esta semana",y);
+    const days=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+    const headers=["Día","Acosté","Tardé","Despertares","T.Despierto","Levanté","Hrs dormidas","Calidad 0-10"];
+    const cW=(W-28)/headers.length;const rH=8;
+    pdfSetColor(doc,BRAND,"fill");doc.rect(14,y,W-28,rH,"F");
+    headers.forEach((h,i)=>{doc.setFontSize(6);doc.setFont("helvetica","bold");pdfSetColor(doc,"#ffffff","text");doc.text(h,14+i*cW+1,y+5);});
+    y+=rH;
+    days.forEach((d,i)=>{
+      pdfSetColor(doc,i%2===0?"#F5F5FF":BRAND_LIGHT,"fill");doc.rect(14,y,W-28,rH,"F");
+      doc.setFontSize(8);doc.setFont("helvetica","bold");pdfSetColor(doc,BRAND_MID,"text");doc.text(d,15,y+5.5);
+      for(let c=1;c<headers.length;c++){doc.setFontSize(7);pdfSetColor(doc,"#CCCCCC","text");doc.text("___",14+c*cW+1,y+5.5);}
+      y+=rH;
+    });y+=4;
+    doc.setFontSize(7);doc.setFont("helvetica","italic");pdfSetColor(doc,GRAY,"text");
+    doc.text("Llena este diario cada mañana al despertar, recordando la noche anterior. No lo llenes durante la noche.",14,y);y+=6;
+  }
+  if(y>240){doc.addPage();pdfFooter(doc,doc.internal.pages.length-1,doc.internal.pages.length);y=20;}
+  y+=4;pdfSetColor(doc,"#F0FFF8","fill");doc.roundedRect(14,y,W-28,16,2,2,"F");
+  pdfSetColor(doc,GREEN,"fill");doc.roundedRect(14,y,3,16,1,1,"F");
+  doc.setFontSize(9);doc.setFont("helvetica","bold");pdfSetColor(doc,GREEN,"text");doc.text("Recuerda esta semana:",20,y+6);
+  doc.setFontSize(9);doc.setFont("helvetica","normal");pdfSetColor(doc,"#1A5C44","text");
+  const ml=doc.splitTextToSize(motivations[session.n]||"¡Sigue adelante!",W-34);doc.text(ml,20,y+11);y+=18;
+  const tp=doc.internal.pages.length-1;for(let p=1;p<=tp;p++){doc.setPage(p);pdfFooter(doc,p,tp);}
+  doc.save(`NapIQ_Semana${session.n}_${patient.name.replace(/ /g,"_")}.pdf`);
+}
+
+// ── PSQI ──────────────────────────────────────────────────────────────────────
+const PSQI_ITEMS=[
+  {id:"q1",text:"¿A qué hora acostumbra acostarse por la noche?",type:"time",comp:null,placeholder:"Ej: 22:30"},
+  {id:"q2",text:"¿Cuántos minutos tarda habitualmente en quedarse dormido/a después de acostarse?",type:"number",comp:2,placeholder:"Minutos"},
+  {id:"q3",text:"¿A qué hora acostumbra levantarse por la mañana?",type:"time",comp:null,placeholder:"Ej: 06:30"},
+  {id:"q4",text:"En el último mes, ¿cuántas horas de sueño real durmió por noche?",type:"number",comp:3,placeholder:"Horas (ej: 6.5)"},
+  {id:"q5a",text:"No pudo dormir en 30 minutos",type:"freq",comp:5},{id:"q5b",text:"Se despertó en medio de la noche o madrugada",type:"freq",comp:5},
+  {id:"q5c",text:"Tuvo que levantarse para ir al baño",type:"freq",comp:5},{id:"q5d",text:"No pudo respirar bien",type:"freq",comp:5},
+  {id:"q5e",text:"Tosió o roncó fuerte",type:"freq",comp:5},{id:"q5f",text:"Sintió mucho frío",type:"freq",comp:5},
+  {id:"q5g",text:"Sintió mucho calor",type:"freq",comp:5},{id:"q5h",text:"Tuvo pesadillas",type:"freq",comp:5},
+  {id:"q5i",text:"Tuvo dolor",type:"freq",comp:5},{id:"q5j",text:"Otro problema para dormir",type:"freq",comp:5},
+  {id:"q6",text:"En el último mes, ¿cómo calificaría la calidad general de su sueño?",type:"select",comp:1,options:["Muy buena (0)","Bastante buena (1)","Bastante mala (2)","Muy mala (3)"],optValues:[0,1,2,3]},
+  {id:"q7",text:"¿Con qué frecuencia tomó medicamentos para dormir?",type:"freq",comp:6},
+  {id:"q8",text:"¿Con qué frecuencia tuvo dificultades para mantenerse despierto/a mientras conducía, comía o en actividades sociales?",type:"freq",comp:7},
+  {id:"q9",text:"¿Cuánto problema representó para usted mantener el ánimo para realizar sus actividades?",type:"select",comp:7,options:["Ningún problema (0)","Solo un leve problema (1)","Algo de problema (2)","Un gran problema (3)"],optValues:[0,1,2,3]},
+];
+const FREQ_OPTS=["Ninguna vez (0)","Menos de 1 vez/sem (1)","1-2 veces/sem (2)","3 o más veces/sem (3)"];
+const FREQ_VALS=[0,1,2,3];
+function calcPSQI(ans){
+  const c1=ans["q6"]??null;
+  let c2=null;
+  if(ans["q2"]!==undefined&&ans["q5a"]!==undefined){const lat=Number(ans["q2"]);const ls=lat<=15?0:lat<=30?1:lat<=60?2:3;const raw=ls+(ans["q5a"]||0);c2=raw===0?0:raw<=2?1:raw<=4?2:3;}
+  let c3=null;if(ans["q4"]!==undefined){const h=Number(ans["q4"]);c3=h>=7?0:h>=6?1:h>=5?2:3;}
+  let c4=null;
+  if(ans["q1"]&&ans["q3"]&&ans["q4"]!==undefined){
+    const[bh,bm]=ans["q1"].split(":").map(Number);const[uh,um]=ans["q3"].split(":").map(Number);
+    let bedMin=bh*60+bm,upMin=uh*60+um;if(upMin<=bedMin)upMin+=1440;
+    const tec=(upMin-bedMin)/60;const eff=tec>0?(Number(ans["q4"])/tec)*100:0;
+    c4=eff>=85?0:eff>=75?1:eff>=65?2:3;
+  }
+  let c5=null;const pk=["q5b","q5c","q5d","q5e","q5f","q5g","q5h","q5i","q5j"];
+  const pv=pk.map(k=>ans[k]).filter(v=>v!==undefined);
+  if(pv.length===pk.length){const sum=pv.reduce((s,v)=>s+v,0);c5=sum===0?0:sum<=9?1:sum<=18?2:3;}
+  const c6=ans["q7"]??null;
+  let c7=null;if(ans["q8"]!==undefined&&ans["q9"]!==undefined){const raw=(ans["q8"]||0)+(ans["q9"]||0);c7=raw===0?0:raw<=2?1:raw<=4?2:3;}
+  const comps=[c1,c2,c3,c4,c5,c6,c7];
+  const total=comps.every(c=>c!==null)?comps.reduce((s,c)=>s+c,0):null;
+  return{c1,c2,c3,c4,c5,c6,c7,total};
+}
+
+// ── SCALES ────────────────────────────────────────────────────────────────────
+const SCALES={
+  psqi:{id:"psqi",name:"Índice de Calidad de Sueño de Pittsburgh (PSQI)",desc:"Evalúa la calidad subjetiva del sueño en el último mes. Versión completa de 19 ítems.",questions:[],options:[],optionValues:[],max:21,
+    interpret:v=>v<=5?{label:"Buena calidad de sueño",color:GREEN,risk:"bajo",detail:"Puntaje ≤5: buena calidad de sueño (sens. 89.6%, esp. 86.5%). Buysse 1989; Mollayeva et al. 2016."}:v<=10?{label:"Mala calidad de sueño",color:AMBER,risk:"moderado",detail:"Puntaje >5: mala calidad de sueño. Evaluación clínica recomendada. Mollayeva et al. Sleep Med Rev. 2016."}:{label:"Muy mala calidad / trastorno probable",color:RED,risk:"alto",detail:"Puntaje >10 asociado a trastorno del sueño clínicamente significativo. Considerar PSG y TCC-I."},
+    ref:"Buysse DJ et al. Psychiatry Res. 1989 | Mollayeva T et al. Sleep Med Rev. 2016;25:52-73."},
+  ess:{id:"ess",name:"Escala de Somnolencia de Epworth (ESS)",desc:"Evalúa la probabilidad de quedarse dormido en 8 situaciones cotidianas.",
+    questions:["Sentado/a leyendo","Viendo televisión","Sentado/a en un lugar público","Como pasajero/a en un auto durante 1 hora","Acostado/a a descansar en la tarde","Sentado/a hablando con alguien","Sentado/a tranquilamente después de comer","En un auto, detenido/a por tráfico unos minutos"],
+    options:["Nunca me dormiría (0)","Poca probabilidad (1)","Probabilidad moderada (2)","Alta probabilidad (3)"],optionValues:[0,1,2,3],max:24,
+    interpret:v=>v<=10?{label:"Normal",color:GREEN,risk:"bajo",detail:"Puntaje ≤10: sin somnolencia clínica significativa (esp. 93%). Kendzerska et al. 2014."}:v<=12?{label:"Somnolencia leve",color:AMBER,risk:"leve",detail:"Zona limítrofe. Algunos estudios sugieren ≥11 como punto de corte más sensible. Chiu et al. 2016."}:v<=17?{label:"Somnolencia moderada",color:"#E24B4A",risk:"moderado",detail:"SDE moderada. Correlaciona con deterioro funcional y AOS. Evaluación clínica indicada."}:{label:"Somnolencia severa",color:RED,risk:"alto",detail:"Puntaje >17: mayor riesgo de accidentes, AOS severa y narcolepsia. Evaluación urgente. Sutton 2021."},
+    ref:"Johns MW. Sleep. 1991 | Kendzerska TB et al. Sleep Med Rev. 2014 | Sutton EL. Med Clin North Am. 2021."},
+  stopbang:{id:"stopbang",name:"Cuestionario STOP-Bang",desc:"Tamizaje de Apnea Obstructiva del Sueño.",
+    questions:["S — ¿Ronca fuerte (escuchable a través de una puerta cerrada)?","T — ¿Se siente frecuentemente cansado/a, fatigado/a o somnoliento/a durante el día?","O — ¿Alguien ha observado que deja de respirar o se ahoga mientras duerme?","P — ¿Tiene o recibe tratamiento para presión alta (hipertensión)?","B — ¿Su índice de masa corporal (IMC) es mayor de 35 kg/m²?","A — ¿Tiene usted más de 50 años?","N — ¿Su circunferencia de cuello es mayor de 40 cm?","G — ¿Es usted del sexo masculino?"],
+    options:["No (0)","Sí (1)"],optionValues:[0,1],max:8,
+    interpret:v=>v<=2?{label:"Riesgo bajo de AOS",color:GREEN,risk:"bajo",detail:"Sens. 83.6% para AOS moderada-severa con puntaje ≤2. VPN 95.7% para AOS severa. Nagappa et al. 2015."}:v<=4?{label:"Riesgo intermedio de AOS",color:AMBER,risk:"moderado",detail:"Probabilidad ~40-60% para AOS moderada-severa. Considerar poligrafía. Chung et al. 2016."}:{label:"Riesgo alto de AOS",color:RED,risk:"alto",detail:"Sens. 93.4% para AOS severa (IAH≥30). Poligrafía o PSG indicada. Nagappa et al. PLoS ONE. 2015."},
+    ref:"Chung F et al. Anesthesiology. 2008 | Nagappa M et al. PLoS ONE. 2015 | Chung F et al. JCSM. 2016."},
+  isi:{id:"isi",name:"Índice de Severidad del Insomnio (ISI)",desc:"Evalúe sus problemas de sueño en las ÚLTIMAS 2 SEMANAS.",
+    questions:["Dificultad para QUEDARSE dormido/a","Dificultad para MANTENERSE dormido/a","Problema de DESPERTAR muy temprano","¿Qué tan SATISFECHO/A está con su sueño ACTUAL? (0=muy satisfecho, 4=muy insatisfecho)","¿En qué medida su problema de sueño INTERFIERE con su funcionamiento diario?","¿En qué medida su problema de sueño es PERCEPTIBLE para personas de su entorno?","¿Qué tan PREOCUPADO/A está por su problema de sueño actual?"],
+    options:["0 — Ninguno/a","1 — Leve","2 — Moderado/a","3 — Severo/a","4 — Muy severo/a"],optionValues:[0,1,2,3,4],max:28,
+    interpret:v=>v<=7?{label:"Sin insomnio clínicamente significativo",color:GREEN,risk:"bajo",detail:"Puntaje ≤7: ausencia de insomnio clínico. Esp. 94.9%. Morin et al. Sleep. 2011."}:v<=14?{label:"Insomnio subclínico",color:AMBER,risk:"leve",detail:"Sens. 82.4%, esp. 82.1%. Intervención temprana con TCC-I puede prevenir cronificación. Morin 2022."}:v<=21?{label:"Insomnio clínico moderado — TCC-I indicada",color:"#E24B4A",risk:"moderado",detail:"Puntaje ≥15: sens. 97.9% para insomnio crónico severo. TCC-I primera línea. Furukawa 2024."}:{label:"Insomnio clínico severo",color:RED,risk:"alto",detail:"Insomnio severo. TCC-I intensiva + evaluación de comorbilidades urgente. Riemann et al. 2023."},
+    ref:"Bastien CH et al. Sleep. 2001 | Morin CM et al. Sleep. 2011 | Riemann D et al. J Sleep Res. 2023."},
+  irls:{id:"irls",name:"Escala Internacional de Gravedad del SPI (IRLS)",desc:"Evalúe sus síntomas de Síndrome de Piernas Inquietas en la ÚLTIMA SEMANA.",
+    questions:["Intensidad de molestias en piernas/brazos (0=ninguna, 4=muy intensa)","Necesidad de moverse (0=ninguna, 4=muy intensa)","Alivio con el movimiento (0=alivio completo, 4=ningún alivio)","Perturbación del sueño (0=ninguna, 4=muy grave)","Cansancio/somnolencia diurna (0=nada, 4=muy cansado)","Gravedad general del SPI (0=ninguna, 4=muy grave)","Frecuencia de síntomas (0=nunca, 4=6-7 días/sem)","Frecuencia de afectación del sueño (0=nunca, 4=6-7 días/sem)","Interferencia con actividades diarias (0=nada, 4=mucho)","Angustia/irritación por el SPI (0=nada, 4=muy angustiado)"],
+    options:["0","1","2","3","4"],optionValues:[0,1,2,3,4],max:40,
+    interpret:v=>v===0?{label:"Sin SPI",color:GREEN,risk:"bajo",detail:"Sin síntomas de SPI."}:v<=10?{label:"SPI leve",color:GREEN,risk:"leve",detail:"SPI leve. Medidas no farmacológicas. Evaluar ferritina (meta >75 ng/mL). Allen et al. 2018."}:v<=20?{label:"SPI moderado",color:AMBER,risk:"moderado",detail:"Considerar tratamiento farmacológico. Primera línea: agonistas dopaminérgicos o ligandos α2δ. García-Borreguero 2016."}:v<=30?{label:"SPI severo",color:"#E24B4A",risk:"alto",detail:"Tratamiento farmacológico indicado. Evaluar riesgo de augmentación. Silber et al. Mayo Clin Proc. 2021."}:{label:"SPI muy severo",color:RED,risk:"alto",detail:"SPI muy severo. Referencia a especialista. Silber MH et al. Mayo Clin Proc. 2021."},
+    ref:"Allen RP et al. Sleep Med. 2003 | García-Borreguero D et al. Sleep Med. 2016 | Silber MH et al. Mayo Clin Proc. 2021."}
+};
+
+// ── TCC-I SESSIONS ────────────────────────────────────────────────────────────
+function buildSessions(isi,psqi){
+  const n=isi>=22?8:isi>=15?7:6;
+  return[
+    {n:1,title:"Evaluación inicial y modelo 3P",focus:"Psicoeducación · Modelo 3P · Diario de sueño",evidenceLevel:"control",evidence:"Marco educativo — base para componentes activos",
+     content:[
+       {heading:"Modelo 3P de Spielman",body:`El insomnio crónico se explica mediante 3 tipos de factores:\n\n▸ PREDISPONENTES — Vulnerabilidad biológica o psicológica preexistente. Ejemplos: tendencia a la ansiedad, hiperarousal del sistema nervioso autónomo, historia familiar de insomnio, rasgos perfeccionistas.\n\n▸ PRECIPITANTES — Estresores que detonaron el insomnio. Ejemplos: duelo, enfermedad, cambio laboral, ruptura de pareja. Generalmente el insomnio comienza siendo adaptativo.\n\n▸ PERPETUANTES — Conductas y pensamientos que MANTIENEN el insomnio aunque el estresor original haya desaparecido. Estos son el objetivo principal de la TCC-I. Ejemplos: pasar más tiempo en cama, siestas compensatorias, revisar el celular si no duerme, cafeína para compensar el cansancio.\n\nTarea del clínico: identificar con el paciente sus factores 3P específicos y crear un mapa personalizado.`},
+       {heading:"Cómo usar el Diario de Sueño",body:`El diario de sueño es la herramienta de automonitoreo fundamental de la TCC-I. Se llena cada MAÑANA, al despertar.\n\nQUÉ REGISTRAR CADA DÍA:\n• Hora en que se metió a la cama (HC)\n• Hora en que intentó dormir (HI)\n• Tiempo que tardó en dormirse / latencia de sueño (LS) en minutos\n• Número de veces que se despertó en la noche\n• Tiempo total despierto en la noche (WASO) en minutos\n• Hora de despertar final (HD)\n• Hora en que se levantó de la cama (HL)\n• Calidad subjetiva del sueño (0-10)\n• Notas: alcohol, medicamentos, estrés, ejercicio\n\nCÁLCULOS:\n• Tiempo en Cama (TEC) = HL − HC\n• Tiempo Total de Sueño (TTS) = TEC − LS − WASO\n• Eficiencia del Sueño (ES) = TTS ÷ TEC × 100%`},
+     ],
+     tarea:"Completar el diario de sueño cada mañana durante 7 días. No intentar dormir 'mejor' esta semana — el objetivo es solo registrar.",
+     nota:"La higiene del sueño como componente aislado no tiene beneficio incremental (iOR 1.01, Furukawa 2024). Se introduce aquí como contexto educativo, no como intervención activa."},
+    {n:2,title:"Restricción del sueño",focus:"Restricción del sueño — iOR 1.49",evidenceLevel:"beneficio",evidence:"iOR 1.49 (IC 95% 1.04-2.13) — mejora eficiencia del sueño y WASO (Furukawa et al. JAMA Psychiatry 2024)",
+     content:[
+       {heading:"Cómo calcular la ventana de sueño inicial",body:`Con los 7 días del diario de sueño:\n\n1. Calcular TTS PROMEDIO: suma de los 7 TTS ÷ 7\n2. VENTANA DE SUEÑO = TTS promedio + 30 min (mínimo 5.5 horas)\n3. FIJAR hora de LEVANTADA: inamovible, todos los días incluyendo fines de semana\n4. Calcular hora de ACOSTARSE: HC = Hora de levantada − Ventana de sueño\n\nEjemplo: TTS promedio = 5.2h → Ventana = 5.7h → Levantada 06:30 → Acostarse a las 00:48\n\n5. El paciente NO debe acostarse antes de la hora prescrita, aunque tenga sueño.`},
+       {heading:"Protocolo de titulación semanal",body:`Cada semana se revisa la Eficiencia del Sueño (ES) promedio:\n\n• ES ≥ 90%: AUMENTAR ventana en 15-20 min (acostarse 15 min antes)\n• ES 85-89%: MANTENER la ventana sin cambios\n• ES < 85%: REDUCIR la ventana en 15 min (acostarse 15 min más tarde)\n\nLa somnolencia diurna intensa la primera semana es ESPERADA — es señal de que el tratamiento está funcionando (presión homeostática del sueño aumentando).`},
+     ],
+     tarea:"Aplicar la ventana de sueño prescrita con hora de levantada fija. Continuar el diario de sueño. Anotar ES diaria.",
+     nota:"Componente con mayor impacto en eficiencia del sueño y WASO. Mecanismo: aumenta la presión homeostática (proceso S de Borbely), consolida el sueño y reduce la fragmentación."},
+    {n:3,title:"Control de estímulos",focus:"Control de estímulos — iOR 1.43",evidenceLevel:"beneficio",evidence:"iOR 1.43 (IC 95% 1.00-2.05) — mejora latencia de sueño y eficiencia (Furukawa et al. 2024)",
+     content:[
+       {heading:"Las 5 reglas de control de estímulos (Bootzin, 1972)",body:`1. IR A LA CAMA SOLO CUANDO TENGA SUEÑO — no solo cuando esté cansado/a. El sueño somnoliento (ojos pesados, cabeza que cae) es diferente al cansancio físico.\n\n2. USAR LA CAMA ÚNICAMENTE PARA DORMIR Y SEXO — no ver televisión, no usar el teléfono, no leer, no comer, no trabajar.\n\n3. LA REGLA DE LOS 20 MINUTOS — Si después de ~20 minutos no se ha dormido, LEVANTARSE de la cama e ir a otra habitación. Realizar una actividad tranquila con luz tenue. Volver a la cama SOLO cuando sienta soñolencia real.\n\n4. REPETIR LA REGLA CUANTAS VECES SEA NECESARIO durante la misma noche.\n\n5. LEVANTARSE A LA MISMA HORA TODOS LOS DÍAS — incluyendo fines de semana.`},
+       {heading:"Manejo de resistencias comunes",body:`"No puedo dormirme si me levanto" — Normalizar: al principio cuesta. Con la práctica, el reconocimiento del sueño somnoliento mejora.\n\n"¿Y si tengo frío / es de madrugada?" — Preparar ropa cómoda y lugar designado con manta. Tener actividades predefinidas.\n\n"¿No será peor madrugar levantándome?" — Mientras más tiempo se pasa en cama sin dormir, más se refuerza el condicionamiento negativo cama-vigilia.`},
+     ],
+     tarea:"Aplicar las 5 reglas sin excepciones. Anotar en el diario cuántas veces aplicó la regla de los 20 min.",
+     nota:"El control de estímulos mejora la latencia de sueño (iMD −7 min, IC 95% −11 a −3) y la eficiencia. Forma el núcleo conductual junto con la restricción del sueño."},
+    {n:4,title:"Reestructuración cognitiva I — Identificación",focus:"Reestructuración cognitiva — iOR 1.68",evidenceLevel:"beneficio",evidence:"iOR 1.68 (IC 95% 1.28-2.20) — mayor beneficio en remisión de todos los componentes evaluados (Furukawa et al. 2024)",
+     content:[
+       {heading:"Modelo cognitivo del insomnio (Harvey, 2002)",body:`El ciclo que mantiene el insomnio:\n1. PREOCUPACIÓN excesiva sobre el sueño al acostarse\n2. ATENCIÓN SELECTIVA: el cerebro "busca" señales de que algo está mal\n3. PERCEPCIÓN DISTORSIONADA: sobreestima el tiempo despierto, subestima el dormido\n4. CONDUCTAS DE SEGURIDAD: intentos de controlar el sueño que lo empeoran\n5. CONSECUENCIAS DIURNAS que refuerzan el ciclo`},
+       {heading:"Técnica: Registro de 3 columnas",body:`SITUACIÓN: "Son las 2 AM y llevo 45 min despierto/a"\nPENSAMIENTO AUTOMÁTICO: "Mañana será horrible, no voy a poder funcionar"\nEMOCIÓN + INTENSIDAD: Angustia 8/10, Frustración 7/10\n\nCreencias disfuncionales frecuentes:\n• "Necesito exactamente 8 horas para funcionar"\n• "He perdido para siempre la capacidad de dormir bien"\n• "Si no duermo esta noche, el día de mañana será un desastre"\n• "Debo controlar mi sueño o algo malo me pasará"\n• "Mi cuerpo no sabe cómo dormir"`},
+     ],
+     tarea:"Registro de 3 columnas: identificar al menos 2 pensamientos disfuncionales sobre el sueño esta semana.",
+     nota:"La reestructuración cognitiva tuvo el mayor iOR entre todos los componentes (1.68). Efecto principal: calidad subjetiva del sueño y remisión a largo plazo."},
+    {n:5,title:"Reestructuración cognitiva II — Cuestionamiento",focus:"Reestructuración cognitiva — iOR 1.68",evidenceLevel:"beneficio",evidence:"iOR 1.68 (IC 95% 1.28-2.20)",
+     content:[
+       {heading:"Cuestionamiento socrático — 5 preguntas clave",body:`1. ¿Qué EVIDENCIA tengo de que este pensamiento es verdad?\n   "¿Hay días que duermo mal y aun así funciono?" → "Sí, a veces."\n\n2. ¿Hay otra forma de VER esta situación?\n   "¿Podría ser que mi cuerpo está en proceso de ajuste?"\n\n3. ¿Qué le diría a un AMIGO/A que pensara esto?\n   "Le diría que exagera, que el cuerpo tiene recursos."\n\n4. ¿Cuál es el PEOR ESCENARIO real?\n   "Estaré cansado/a mañana" — ¿Es catastrófico? ¿Ya lo sobreviví antes?\n\n5. ¿Cómo me PERJUDICA pensar esto?\n   "Pensar en el desastre genera más ansiedad y menos sueño."`},
+       {heading:"Paradoja del control del sueño",body:`El sueño empeora con el esfuerzo consciente de controlarlo — como la digestión o la respiración automática.\n\nEl "esfuerzo de dormir" activa el sistema nervioso simpático, exactamente lo contrario de lo necesario.\n\nMensaje terapéutico clave: el objetivo no es dormir perfectamente, sino RELACIONARSE DIFERENTE con el sueño. "Dormir suficientemente bien" es el nuevo estándar.`},
+     ],
+     tarea:"Completar 5 columnas (añadir pensamiento alternativo + resultado al día siguiente). Verificar si las predicciones catastrofistas se cumplieron.",
+     nota:"La combinación de reestructuración cognitiva + tercera ola tiene el mayor efecto sobre calidad subjetiva del sueño."},
+    {n:6,title:"Tercera ola — Mindfulness y ACT",focus:"Componentes de tercera ola — iOR 1.49",evidenceLevel:"beneficio",evidence:"iOR 1.49 (IC 95% 1.10-2.03) — mejora calidad subjetiva del sueño y remisión (Furukawa et al. 2024)",
+     content:[
+       {heading:"Diferencia conceptual: control vs aceptación",body:`TCC clásica: identifica y CAMBIA pensamientos disfuncionales.\nTercera ola (Mindfulness/ACT): aprende a RELACIONARSE DIFERENTE con los pensamientos — no cambiarlos, sino no dejarse arrastrar por ellos.\n\nMensaje central de ACT para insomnio:\n"El problema no es NO dormir — el problema es la LUCHA contra no dormir. El sufrimiento = Dolor × Resistencia."`},
+       {heading:"Defusión cognitiva",body:`En lugar de "Mañana estaré fatal" → "Estoy teniendo el pensamiento de que mañana estaré fatal"\n• Visualizar el pensamiento como una hoja que flota en un río\n• Técnica del "radio de fondo": los pensamientos son como una radio — puedes escucharlos sin que controlen lo que haces`},
+       {heading:"Mindfulness pre-sueño (5-10 min)",body:`IMPORTANTE: la práctica NO se hace EN cama. Se hace sentado/a en una silla cómoda, 30-60 min antes de la hora de acostarse.\n\nEjercicio básico de escaneo corporal:\n1. Sentado/a con ojos cerrados, respiración natural\n2. Llevar la atención a los pies — sensaciones: frío, calor, presión\n3. Subir lentamente: tobillos, piernas, abdomen, pecho, hombros, cuello, cabeza\n4. Cuando aparezca un pensamiento, note: "pensamiento" y regrese al cuerpo\n5. No hay objetivo de relajarse — solo observar\n\nPreocupación constructiva: 30 min antes de acostarse, anotar 3 preocupaciones + una acción posible para cada una. Luego cerrar el cuaderno.`},
+     ],
+     tarea:"Práctica de mindfulness 5-10 min diarios (fuera de cama). Lista de preocupación constructiva si aplica. Continuar diario de sueño.",
+     nota:"El ligero aumento en dropout asociado a tercera ola (iOR 1.46) se reduce con psicoeducación previa clara sobre el concepto de aceptación."},
+    ...(n>=7?[{n:7,title:"Consolidación y prevención de recaídas",focus:"Mantenimiento de ganancias",evidenceLevel:"mantenimiento",evidence:"Reestructuración cognitiva asociada a remisión a largo plazo (iOR 1.59, Furukawa 2024)",
+     content:[
+       {heading:"Revisión de progreso",body:`Reaplicar ISI y PSQI. Comparar con valores basales.\n\nCriterios de respuesta:\n• REMISIÓN: ISI < 8\n• RESPUESTA: reducción ≥8 puntos en ISI\n• RESPUESTA PARCIAL: reducción 4-7 puntos en ISI\n\nSi no hay respuesta: revisar adherencia a restricción del sueño y control de estímulos.`},
+       {heading:"Plan personal de mantenimiento",body:`El paciente elabora su plan escrito con:\n\n3 REGLAS NO NEGOCIABLES (las que más le funcionaron).\n\n2 SEÑALES DE ALERTA TEMPRANA personales.\n\n3 HERRAMIENTAS DE PRIMERA RESPUESTA ante recaída.\n\nEl insomnio puede regresar ante estresores vitales — esto es normal. Tener el plan escrito permite intervenir antes de que se cronifique.`},
+     ],
+     tarea:"Escribir el plan personal de mantenimiento. Completar ISI y PSQI de seguimiento.",
+     nota:"La reestructuración cognitiva fue el único componente con asociación significativa a remisión a largo plazo (iOR 1.59)."}]:[]),
+    ...(n>=8?[{n:8,title:"Sesión de seguimiento — 4 semanas post-tratamiento",focus:"Booster session",evidenceLevel:"mantenimiento",evidence:"Sesión booster post-tratamiento — mantenimiento de remisión (Morin et al. Sleep. 2009)",
+     content:[
+       {heading:"Evaluación de mantenimiento",body:`Reaplicar ISI y comparar con post-tratamiento.\n\nCriterios para sesiones adicionales:\n• ISI >14: reiniciar protocolo completo\n• ISI 8-14: sesiones de refuerzo focalizadas\n• ISI <8: alta terapéutica con seguimiento a 3 y 6 meses`},
+     ],
+     tarea:"Mantener horario de sueño regular. Contactar al clínico si ISI >14.",
+     nota:"Una sesión booster a las 4 semanas post-tratamiento está asociada a mayor mantenimiento de ganancias (Morin CM et al. Sleep. 2009)."}]:[])
+  ];
+}
+
+// ── DIAGNOSTICS ───────────────────────────────────────────────────────────────
+const DIAG_CATS=["Todos","Insomnias","Trastornos respiratorios","Hipersomnias","Trastornos circadianos","Parasomnias","Trastornos de movimiento","Comórbidos / asociados"];
+const DX=[
+  {id:"ic",cat:"Insomnias",name:"Insomnio crónico",def:"Dificultad persistente para iniciar o mantener el sueño con impacto diurno ≥3 meses.",icsd:"≥3 noches/semana, ≥3 meses, impacto diurno, oportunidad adecuada de sueño.",dsm:"Trastorno de insomnio — ≥3 meses, ≥3 noches/sem, malestar/deterioro funcional.",scales:["ISI","PSQI"],alarms:["Ideación suicida","Síntomas psicóticos","Pérdida ponderal"],evidence:"Ia",ref:"Sateia MJ. Chest. 2014 | Riemann D et al. J Sleep Res. 2023."},
+  {id:"ia",cat:"Insomnias",name:"Insomnio agudo",def:"Insomnio <3 meses, precipitado por estresor identificable.",icsd:"Criterios similares al insomnio crónico pero duración <3 meses.",dsm:"Trastorno de insomnio especificado si duración <3 meses.",scales:["ISI","PSQI"],alarms:["Persistencia >3 meses","Inicio de sustancias"],evidence:"IIb",ref:"AASM. ICSD-3-TR. 2023."},
+  {id:"ips",cat:"Insomnias",name:"Insomnio psicofisiológico",def:"Insomnio condicionado por hiperarousal somático y asociaciones negativas con el entorno de sueño.",icsd:"Hiperarousal cognitivo-somático, dificultad para dormirse en cama propia pero no en otro contexto.",dsm:"Trastorno de insomnio.",scales:["ISI","PSQI"],alarms:["Respuesta paradójica a BZD","Ansiedad generalizada"],evidence:"IIa",ref:"Harvey AG. Psychol Rev. 2002."},
+  {id:"ipar",cat:"Insomnias",name:"Insomnio paradójico",def:"Queja de sueño muy insuficiente con PSG relativamente normal.",icsd:"Queja severa de insomnio con mínima evidencia objetiva.",dsm:"Espectro del trastorno de insomnio.",scales:["ISI","PSQI"],alarms:["No sobretratar con hipnóticos","PSG ante discordancia severa"],evidence:"IIb",ref:"Edinger JD et al. Sleep. 2011."},
+  {id:"icom",cat:"Insomnias",name:"Insomnio comórbido",def:"Insomnio que coexiste con condición médica/psiquiátrica como entidad independiente.",icsd:"Entidad independiente que requiere tratamiento propio.",dsm:"Codificar ambas condiciones independientemente.",scales:["ISI","PSQI"],alarms:["Evaluar depresión (PHQ-9)","Descartar AOS"],evidence:"Ia",ref:"Morin CM et al. Sleep Med Rev. 2015."},
+  {id:"aos",cat:"Trastornos respiratorios",name:"Apnea obstructiva del sueño",def:"Colapso recurrente de vía aérea superior durante el sueño.",icsd:"IAH ≥15/h sin síntomas, o ≥5/h con somnolencia/ronquido/apneas/comorbilidades.",dsm:"Apnea/hipopnea obstructiva del sueño.",scales:["STOP-Bang","ESS","PSQI"],alarms:["IAH >30 sin Tx","HTA refractaria","Arritmias nocturnas"],evidence:"Ia",ref:"Kapur VK et al. J Clin Sleep Med. 2017."},
+  {id:"acs",cat:"Trastornos respiratorios",name:"Apnea central del sueño",def:"Cese del flujo aéreo por ausencia de esfuerzo ventilatorio.",icsd:"≥5 apneas centrales/hora en PSG.",dsm:"Apnea/hipopnea del sueño — subtipo central.",scales:["STOP-Bang","ESS"],alarms:["IC concomitante","Opioides","ACV reciente"],evidence:"IIa",ref:"Gottlieb DJ, Punjabi NM. JAMA. 2020."},
+  {id:"hipo",cat:"Trastornos respiratorios",name:"Hipoventilación relacionada al sueño",def:"Reducción de ventilación durante el sueño con hipercapnia.",icsd:"PaCO₂ >55 mmHg ≥10 min, o incremento ≥10 mmHg respecto a vigilia.",dsm:"Hipoventilación relacionada con el sueño.",scales:["STOP-Bang","ESS"],alarms:["Cefalea matutina","Poliglobulia","Cor pulmonale"],evidence:"IIa",ref:"Masa JF et al. Lancet Respir Med. 2019."},
+  {id:"n1",cat:"Hipersomnias",name:"Narcolepsia tipo 1",def:"SDE, cataplejía y deficiencia de hipocretina-1.",icsd:"SDE ≥3 meses + cataplejía Y/O hipocretina LCR ≤110 pg/mL, o MSLT ≤8 min + ≥2 SOREMP.",dsm:"Narcolepsia con cataplejía/deficiencia de hipocretina.",scales:["ESS","PSQI"],alarms:["Cataplejía","Alucinaciones hipnagógicas","Conducta automática"],evidence:"Ia",ref:"Bassetti CLA et al. Nat Rev Dis Primers. 2019."},
+  {id:"hi",cat:"Hipersomnias",name:"Hipersomnia idiopática",def:"SDE crónica sin cataplejía, sin SOREMP en MSLT, con sueño prolongado.",icsd:"SDE ≥3 meses + MSLT <2 SOREMP, o TTS ≥660 min en 24h.",dsm:"Hipersomnia sin trastorno mental coexistente.",scales:["ESS","PSQI"],alarms:["Borrachera de sueño severa","Deterioro laboral grave"],evidence:"IIa",ref:"Trotti LM. Sleep Med Rev. 2017."},
+  {id:"fsr",cat:"Trastornos circadianos",name:"Síndrome de fase de sueño retrasada",def:"Retraso del ciclo sueño-vigilia ≥2h, crónico, con incapacidad de avanzar.",icsd:"Retraso ≥2h del periodo principal de sueño, ≥3 meses.",dsm:"Trastorno de ritmo circadiano — tipo fase retrasada.",scales:["PSQI","ESS"],alarms:["Inicio adolescencia","Comorbilidad depresión/TDAH"],evidence:"IIa",ref:"Auger RR et al. J Clin Sleep Med. 2015."},
+  {id:"turn",cat:"Trastornos circadianos",name:"Trastorno por trabajo en turnos",def:"Insomnio y/o SDE por horarios laborales superpuestos al periodo de sueño habitual.",icsd:"Insomnio/SDE asociado a trabajo en turnos ≥3 meses.",dsm:"Trastorno de ritmo circadiano — tipo turnos.",scales:["ISI","ESS","PSQI"],alarms:["Errores críticos","Accidentes de tránsito"],evidence:"IIa",ref:"Drake CL et al. Sleep. 2004."},
+  {id:"son",cat:"Parasomnias",name:"Sonambulismo",def:"Deambulación o conductas complejas durante sueño N3 con amnesia posterior.",icsd:"Arousal incompleto de N3, conductas motoras complejas, amnesia.",dsm:"Trastorno de arousal NREM — tipo sonambulismo.",scales:["PSQI"],alarms:["Conductas peligrosas","Inicio en adultos"],evidence:"IIa",ref:"Stallman HM et al. Sleep Med Rev. 2016."},
+  {id:"tcsr",cat:"Parasomnias",name:"Trastorno de conducta del sueño REM",def:"Actividad motora compleja durante sueño REM por pérdida de atonía muscular.",icsd:"Conductas durante REM + RSWA en PSG o videoPSG diagnóstica.",dsm:"Trastorno de conducta del sueño REM.",scales:["PSQI"],alarms:["Marcador preclínico sinucleinopatía","Lesiones al compañero"],evidence:"Ia",ref:"Postuma RB et al. Neurology. 2019."},
+  {id:"pes",cat:"Parasomnias",name:"Trastorno de pesadillas",def:"Pesadillas recurrentes con malestar significativo o deterioro funcional.",icsd:"Sueños perturbadores recurrentes desde REM con malestar o deterioro.",dsm:"Trastorno de pesadillas.",scales:["PSQI","ISI"],alarms:["TEPT subyacente","Medicamentos (betabloqueadores)"],evidence:"IIa",ref:"Morgenthaler TI et al. Sleep. 2018."},
+  {id:"spi",cat:"Trastornos de movimiento",name:"Síndrome de piernas inquietas",def:"Urgencia de mover piernas con sensaciones desagradables, predominio nocturno.",icsd:"5 criterios IRLSSG: urgencia + sensaciones, inicio con reposo, alivio con movimiento, predominio vespertino/nocturno.",dsm:"Síndrome de piernas inquietas.",scales:["IRLS","PSQI"],alarms:["Ferritina <50 ng/mL","Insuficiencia renal","Embarazo"],evidence:"Ia",ref:"Allen RP et al. Sleep Med. 2014 | Silber MH et al. Mayo Clin Proc. 2021."},
+  {id:"brux",cat:"Trastornos de movimiento",name:"Bruxismo del sueño",def:"Actividad parafuncional del masétero durante sueño.",icsd:"Diagnóstico clínico: rechinado + desgaste dental, dolor mandibular matutino.",dsm:"No categoría específica.",scales:["PSQI"],alarms:["Dolor orofacial crónico","Cefalea tensional matutina"],evidence:"IIa",ref:"Lobbezoo F et al. J Oral Rehabil. 2018."},
+  {id:"sp",cat:"Comórbidos / asociados",name:"Trastornos del sueño en trastornos psiquiátricos",def:"Insomnio, hipersomnia o alteraciones REM en depresión, ansiedad o bipolar.",icsd:"Diagnosticar y tratar independientemente de la condición psiquiátrica.",dsm:"Especificar comorbilidad. En TDM: insomnio/hipersomnia como criterio.",scales:["ISI","PSQI","ESS"],alarms:["Insomnio como pródromo de manía","Riesgo suicida"],evidence:"Ia",ref:"Harvey AG. Annu Rev Clin Psychol. 2008."},
+  {id:"sn",cat:"Comórbidos / asociados",name:"Trastornos del sueño en enfermedades neurológicas",def:"Trastornos del sueño en Parkinson, Alzheimer, epilepsia.",icsd:"Diagnosticar independientemente. TCSR como marcador preclínico de sinucleinopatía.",dsm:"Trastorno del sueño debido a afección médica.",scales:["ESS","PSQI","ISI","IRLS"],alarms:["TCSR preclínico Parkinson","Epilepsia nocturna vs parasomnia"],evidence:"IIa",ref:"Iranzo A. Curr Neurol Neurosci Rep. 2016."},
+];
+
+// ── GLOSSARY ──────────────────────────────────────────────────────────────────
+const GLOS=[
+  {t:"AHI / IAH",d:"Índice de Apnea-Hipopnea. Normal <5; leve 5-14; moderado 15-29; severo ≥30 eventos/hora."},
+  {t:"Atonía muscular REM",d:"Parálisis muscular fisiológica durante REM. Su ausencia define el TCSR."},
+  {t:"Cataplejía",d:"Pérdida súbita del tono muscular por emoción intensa. Patognomónica de narcolepsia tipo 1."},
+  {t:"CPAP",d:"Presión Positiva Continua en Vía Aérea. Primera línea en AOS moderada-severa."},
+  {t:"Eficiencia del sueño (ES)",d:"ES = TTS ÷ TEC × 100%. Normal ≥85%. Meta terapéutica en restricción del sueño TCC-I."},
+  {t:"Hiperarousal",d:"Activación fisiológica y cognitiva elevada. Mecanismo central del insomnio crónico. Objetivo de TCC-I."},
+  {t:"Hipnograma",d:"Gráfica de la arquitectura del sueño — ciclos NREM-REM a lo largo de la noche."},
+  {t:"Hipocretina/Orexina",d:"Neuropéptido hipotalámico. Deficiencia (≤110 pg/mL en LCR) = narcolepsia tipo 1."},
+  {t:"ICSD-3 TR",d:"International Classification of Sleep Disorders, 3rd ed. Text Revision. AASM, 2023."},
+  {t:"iOR",d:"Incremental Odds Ratio. Beneficio incremental de cada componente TCC-I (Furukawa et al. JAMA Psychiatry 2024)."},
+  {t:"Latencia de sueño (LS)",d:"Tiempo desde que se intenta dormir hasta N1. Normal <20 min. Punto de corte clínico >30 min."},
+  {t:"Modelo 3P",d:"Spielman: factores Predisponentes, Precipitantes y Perpetuantes del insomnio. Base conceptual de TCC-I."},
+  {t:"MSLT",d:"Multiple Sleep Latency Test. Latencia media ≤8 min + ≥2 SOREMP: diagnóstico de narcolepsia."},
+  {t:"Polisomnografía (PSG)",d:"Estudio gold standard del sueño. Registra EEG, EOG, EMG, flujo aéreo, SpO₂, ECG."},
+  {t:"Presión homeostática",d:"Proceso S de Borbely: necesidad de sueño acumulada durante la vigilia. La restricción del sueño la aumenta."},
+  {t:"Regla de los 20 min",d:"Control de estímulos: si no se duerme en ~20 min, levantarse. Rompe el condicionamiento cama-vigilia."},
+  {t:"Restricción del sueño",d:"Ventana = TTS promedio + 30 min (mínimo 5.5h). Ajuste semanal por ES. iOR 1.49 (Furukawa 2024)."},
+  {t:"RSWA",d:"REM Sleep Without Atonia. Hallazgo PSG diagnóstico en TCSR."},
+  {t:"SOREMP",d:"Sleep Onset REM Period. REM ≤15 min del inicio del sueño. ≥2 en MSLT: criterio de narcolepsia."},
+  {t:"TCC-I",d:"Terapia Cognitivo-Conductual para el Insomnio. Paquete óptimo (Furukawa 2024): reestructuración cognitiva (1.68) + tercera ola (1.49) + restricción del sueño (1.49) + control de estímulos (1.43) + presencial (1.83)."},
+  {t:"TEC",d:"Tiempo en Cama. Tiempo total desde acostarse hasta levantarse. Manipulado en la restricción del sueño."},
+  {t:"TTS",d:"Tiempo Total de Sueño. TEC − LS − WASO. Normal 7-9h en adultos."},
+  {t:"WASO",d:"Wake After Sleep Onset. Tiempo despierto después del inicio del sueño. Clínicamente significativo >30 min."},
+  {t:"Zeitgeber",d:"Sincronizador del ritmo circadiano. Principal: luz. También: temperatura, ejercicio, horarios de comida."},
+].sort((a,b)=>a.t.localeCompare(b.t,"es"));
+
+// ── FORMULAS ──────────────────────────────────────────────────────────────────
+const FORMULAS=[
+  {id:"tts",name:"Tiempo Total de Sueño promedio (TTS)",desc:"Calcula el TTS promedio semanal a partir del diario de sueño.",
+   fields:[{id:"d1",label:"TTS día 1 (h)",ph:"5.5"},{id:"d2",label:"TTS día 2 (h)",ph:"6.0"},{id:"d3",label:"TTS día 3 (h)",ph:"5.0"},{id:"d4",label:"TTS día 4 (h)",ph:"6.5"},{id:"d5",label:"TTS día 5 (h)",ph:"5.5"},{id:"d6",label:"TTS día 6 (h)",ph:"4.5"},{id:"d7",label:"TTS día 7 (h)",ph:"6.0"}],
+   calc:v=>{const vals=Object.values(v).map(Number).filter(x=>!isNaN(x)&&x>0);if(vals.length<3)return null;const avg=vals.reduce((s,x)=>s+x,0)/vals.length;return{value:avg.toFixed(1),unit:"horas/noche",interp:avg>=7?"TTS normal (7-9h, AASM 2015). Verificar eficiencia del sueño.":avg>=6?`TTS leve-moderadamente reducido. Ventana de sueño inicial sugerida: ${(avg+0.5).toFixed(1)}h.`:`TTS significativamente reducido. Ventana sugerida: ${Math.max(5.5,avg+0.5).toFixed(1)}h (mínimo 5.5h). Alertar sobre somnolencia transitoria.`};}},
+  {id:"es",name:"Eficiencia del Sueño (ES)",desc:"ES = (TTS ÷ TEC) × 100%. Meta terapéutica ≥85% en TCC-I.",
+   fields:[{id:"tts",label:"TTS — horas dormidas",ph:"5.5"},{id:"tec",label:"TEC — tiempo en cama (h)",ph:"8.0"}],
+   calc:v=>{const tts=Number(v.tts),tec=Number(v.tec);if(!tts||!tec)return null;const es=(tts/tec)*100;return{value:es.toFixed(1),unit:"%",interp:es>=90?"ES ≥90%: AUMENTAR ventana 15-20 min.":es>=85?"ES 85-89%: MANTENER ventana sin cambios.":es>=75?"ES 75-84%: MANTENER o reducir 15 min.":"ES <75%: REDUCIR ventana 15 min. Reforzar adherencia."};}},
+  {id:"vs",name:"Ventana de Sueño inicial",desc:"Calcula la hora de acostarse prescrita según TTS promedio y hora de levantada fija.",
+   fields:[{id:"tts",label:"TTS promedio (h)",ph:"5.2"},{id:"hl",label:"Hora de levantada (HH:MM)",ph:"06:30"}],
+   calc:v=>{const tts=Number(v.tts);const[hh,mm]=(v.hl||"").split(":").map(Number);if(!tts||isNaN(hh)||isNaN(mm))return null;const vs=Math.max(5.5,tts+0.5);const hlMin=hh*60+mm;let hcMin=hlMin-(vs*60);if(hcMin<0)hcMin+=1440;const hcH=Math.floor(hcMin/60)%24,hcM=Math.round(hcMin%60);const hcStr=`${String(hcH).padStart(2,"0")}:${String(hcM).padStart(2,"0")}`;return{value:`${vs.toFixed(1)}h — Acostarse: ${hcStr}`,unit:"",interp:`Ventana: ${vs.toFixed(1)}h. Acostarse: ${hcStr}. Levantada fija: ${v.hl}.\nNO acostarse antes de las ${hcStr} aunque tenga sueño.`};}},
+  {id:"ls",name:"Latencia de Sueño promedio (LS)",desc:"Tiempo promedio para conciliar el sueño. Punto de corte clínico >30 min.",
+   fields:[{id:"d1",label:"LS día 1 (min)",ph:"45"},{id:"d2",label:"LS día 2 (min)",ph:"30"},{id:"d3",label:"LS día 3 (min)",ph:"60"},{id:"d4",label:"LS día 4 (min)",ph:"40"},{id:"d5",label:"LS día 5 (min)",ph:"55"},{id:"d6",label:"LS día 6 (min)",ph:"35"},{id:"d7",label:"LS día 7 (min)",ph:"50"}],
+   calc:v=>{const vals=Object.values(v).map(Number).filter(x=>!isNaN(x)&&x>=0);if(vals.length<3)return null;const avg=vals.reduce((s,x)=>s+x,0)/vals.length;return{value:avg.toFixed(0),unit:"minutos",interp:avg<=15?"LS normal (≤15 min).":avg<=30?"LS levemente prolongada (15-30 min). Monitorear.":avg<=60?"LS prolongada (>30 min) — clínicamente significativa. Control de estímulos indicado.":"LS muy prolongada (>60 min). Control de estímulos + restricción del sueño prioritarios."};}},
+  {id:"waso",name:"WASO promedio",desc:"Tiempo promedio despierto después de dormirse. Punto de corte: >30 min.",
+   fields:[{id:"d1",label:"WASO día 1 (min)",ph:"60"},{id:"d2",label:"WASO día 2 (min)",ph:"45"},{id:"d3",label:"WASO día 3 (min)",ph:"90"},{id:"d4",label:"WASO día 4 (min)",ph:"30"},{id:"d5",label:"WASO día 5 (min)",ph:"75"},{id:"d6",label:"WASO día 6 (min)",ph:"50"},{id:"d7",label:"WASO día 7 (min)",ph:"40"}],
+   calc:v=>{const vals=Object.values(v).map(Number).filter(x=>!isNaN(x)&&x>=0);if(vals.length<3)return null;const avg=vals.reduce((s,x)=>s+x,0)/vals.length;return{value:avg.toFixed(0),unit:"minutos",interp:avg<=20?"WASO normal (≤20 min).":avg<=30?"WASO limítrofe. Monitorear.":avg<=60?"WASO clínicamente significativo (>30 min). Restricción del sueño indicada (iMD −7 min, Furukawa 2024).":"WASO muy elevado (>60 min). Restricción + control de estímulos prioritarios. Descartar AOS."};}},
+  {id:"imc",name:"Índice de Masa Corporal (IMC)",desc:"Relevante para tamizaje de AOS y Síndrome de Hipoventilación por Obesidad.",
+   fields:[{id:"peso",label:"Peso (kg)",ph:"85"},{id:"talla",label:"Talla (m)",ph:"1.72"}],
+   calc:v=>{const p=Number(v.peso),t=Number(v.talla);if(!p||!t)return null;const imc=p/(t*t);return{value:imc.toFixed(1),unit:"kg/m²",interp:imc<25?"Peso normal. Riesgo bajo para AOS por obesidad.":imc<30?"Sobrepeso. Riesgo moderado para AOS. Aplicar STOP-Bang.":imc<35?"Obesidad grado I. Riesgo elevado para AOS. STOP-Bang + poligrafía recomendada.":imc<40?"Obesidad grado II. Criterio STOP-Bang positivo (B+). Evaluación especializada.":"Obesidad grado III. Riesgo muy alto AOS severa y SHO. PSG/poligrafía urgente."};}},
+  {id:"nnt",name:"NNT — Número Necesario a Tratar (TCC-I)",desc:"Cuántos pacientes tratar con TCC-I para que uno remita vs psicoeducación. Furukawa 2024.",
+   fields:[{id:"cer",label:"Tasa de remisión control (0.0-1.0)",ph:"0.14"}],
+   calc:v=>{const cer=Number(v.cer);if(!cer||cer<=0||cer>=1)return null;const or=5.34;const en=or*cer,ed=1-cer+en,eer=en/ed,rd=eer-cer,nnt=1/rd;return{value:nnt.toFixed(1),unit:"pacientes",interp:`Con CER ${(cer*100).toFixed(0)}%:\n• Tasa de remisión con TCC-I: ${(eer*100).toFixed(1)}%\n• Diferencia de riesgo: +${(rd*100).toFixed(1)}%\n• NNT: ${nnt.toFixed(1)} pacientes\nFuente: Furukawa Y et al. JAMA Psychiatry. 2024;81(4):357-365.`};}},
+];
+
+// ── UI COMPONENTS ─────────────────────────────────────────────────────────────
+const PC={"Ia":GREEN,"IIa":AMBER,"IIb":GRAY};
+const SC={"beneficio":BRAND,"control":GRAY,"mantenimiento":GREEN};
+const SL={"beneficio":"Componente activo","control":"Marco educativo","mantenimiento":"Mantenimiento"};
+
+function ScaleForm({scale,onComplete,onBack}){
+  const [ans,setAns]=useState({});
+  if(scale.id==="psqi"){
+    const r=calcPSQI(ans);
+    const cNames=["Calidad subjetiva","Latencia","Duración","Eficiencia","Perturbaciones","Medicación","Disfunción diurna"];
+    const cVals=[r.c1,r.c2,r.c3,r.c4,r.c5,r.c6,r.c7];
+    return(
+      <div>
+        <button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}>← Volver</button>
+        <h2 style={{fontSize:17,fontWeight:500,marginBottom:4}}>{scale.name}</h2>
+        <p style={{fontSize:13,color:"#555577",marginBottom:"0.5rem"}}>{scale.desc}</p>
+        <div style={{padding:"0.75rem 1rem",background:BRAND_LIGHT,borderRadius:8,marginBottom:"1.5rem",fontSize:12,color:BRAND}}>Responda pensando en el ÚLTIMO MES. Puede contestarlo usted mismo/a o su paciente.</div>
+        <div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+          <p style={{fontSize:13,fontWeight:500,marginBottom:12}}>Horarios de sueño habituales</p>
+          {[{id:"q1",text:"¿A qué hora acostumbra acostarse por la noche?",type:"time"},{id:"q3",text:"¿A qué hora acostumbra levantarse por la mañana?",type:"time"},{id:"q4",text:"¿Cuántas horas de sueño real durmió por noche en el último mes?",type:"number",step:"0.5",ph:"Ej: 6.5"},{id:"q2",text:"¿Cuántos minutos tarda habitualmente en quedarse dormido/a?",type:"number",ph:"Minutos"}].map(item=>(
+            <div key={item.id} style={{marginBottom:10}}>
+              <p style={{fontSize:13,marginBottom:4,color:"#555577"}}>{item.text}</p>
+              <input type={item.type} placeholder={item.ph||""} step={item.step||"1"} value={ans[item.id]||""} onChange={e=>setAns({...ans,[item.id]:e.target.value})}
+                style={{padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e",width:180}}/>
+            </div>
+          ))}
+        </div>
+        <div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+          <p style={{fontSize:13,fontWeight:500,marginBottom:4}}>En el último mes, ¿con qué frecuencia tuvo problemas para dormir por estas razones?</p>
+          <p style={{fontSize:11,color:"#999",marginBottom:12}}>0 = Ninguna vez | 1 = Menos de 1 vez/sem | 2 = 1-2 veces/sem | 3 = 3 o más veces/sem</p>
+          {PSQI_ITEMS.filter(i=>i.type==="freq").map(item=>(
+            <div key={item.id} style={{marginBottom:10}}>
+              <p style={{fontSize:12,color:"#555577",marginBottom:5}}>{item.text}</p>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                {FREQ_OPTS.map((opt,j)=>(
+                  <button key={j} onClick={()=>setAns({...ans,[item.id]:FREQ_VALS[j]})}
+                    style={{padding:"4px 8px",fontSize:11,borderRadius:16,border:ans[item.id]===FREQ_VALS[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[item.id]===FREQ_VALS[j]?BRAND_LIGHT:"#fff",color:ans[item.id]===FREQ_VALS[j]?BRAND_MID:"#1a1a2e",cursor:"pointer"}}>{j}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+          <p style={{fontSize:13,fontWeight:500,marginBottom:12}}>Percepción y funcionamiento</p>
+          {PSQI_ITEMS.filter(i=>i.type==="select").map(item=>(
+            <div key={item.id} style={{marginBottom:12}}>
+              <p style={{fontSize:13,color:"#555577",marginBottom:6}}>{item.text}</p>
+              <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                {item.options.map((opt,j)=>(
+                  <button key={j} onClick={()=>setAns({...ans,[item.id]:item.optValues[j]})}
+                    style={{padding:"7px 12px",fontSize:12,borderRadius:8,border:ans[item.id]===item.optValues[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[item.id]===item.optValues[j]?BRAND_LIGHT:"#fff",color:ans[item.id]===item.optValues[j]?BRAND_MID:"#1a1a2e",cursor:"pointer",textAlign:"left"}}>{opt}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+          {[{id:"q7",label:"¿Con qué frecuencia tomó medicamentos para dormir (con o sin receta)?"},{id:"q8",label:"¿Con qué frecuencia tuvo dificultades para mantenerse despierto/a al conducir, comer o en actividades sociales?"}].map(item=>(
+            <div key={item.id} style={{marginBottom:12}}>
+              <p style={{fontSize:13,color:"#555577",marginBottom:6}}>{item.label}</p>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+                {FREQ_OPTS.map((opt,j)=>(
+                  <button key={j} onClick={()=>setAns({...ans,[item.id]:FREQ_VALS[j]})}
+                    style={{padding:"4px 8px",fontSize:11,borderRadius:16,border:ans[item.id]===FREQ_VALS[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[item.id]===FREQ_VALS[j]?BRAND_LIGHT:"#fff",color:ans[item.id]===FREQ_VALS[j]?BRAND_MID:"#1a1a2e",cursor:"pointer"}}>{j}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        {cVals.some(c=>c!==null)&&(
+          <div style={{marginBottom:"1.25rem",padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+            <p style={{fontSize:13,fontWeight:500,marginBottom:10}}>Componentes (0-3 cada uno)</p>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:6}}>
+              {cNames.map((n,i)=>cVals[i]!==null&&(
+                <div key={i} style={{padding:"0.5rem 0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}>
+                  <p style={{fontSize:10,color:"#999",margin:"0 0 2px"}}>{n}</p>
+                  <p style={{fontSize:18,fontWeight:500,margin:0,color:cVals[i]===0?GREEN:cVals[i]===1?AMBER:cVals[i]===2?"#E24B4A":RED}}>{cVals[i]}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {r.total!==null&&(
+          <div style={{margin:"1rem 0",padding:"1rem 1.25rem",borderRadius:10,border:`1.5px solid ${r.total<=5?GREEN:r.total<=10?AMBER:RED}`}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+              <span style={{fontSize:13,color:"#555577"}}>Puntaje global PSQI</span>
+              <span style={{fontSize:28,fontWeight:500,color:r.total<=5?GREEN:r.total<=10?AMBER:RED}}>{r.total} / 21</span>
+            </div>
+            <div style={{padding:"5px 12px",borderRadius:20,background:(r.total<=5?GREEN:r.total<=10?AMBER:RED)+"22",display:"inline-block",fontSize:13,fontWeight:500,color:r.total<=5?GREEN:r.total<=10?AMBER:RED,marginBottom:6}}>
+              {r.total<=5?"Buena calidad de sueño":r.total<=10?"Mala calidad de sueño":"Muy mala calidad / trastorno probable"}
+            </div>
+            <p style={{fontSize:11,color:"#999",margin:0}}>Ref: Buysse DJ et al. 1989 | Mollayeva et al. Sleep Med Rev. 2016.</p>
+          </div>
+        )}
+        <button onClick={()=>r.total!==null&&onComplete({scaleId:"psqi",scaleName:"PSQI",score:r.total,max:21,label:r.total<=5?"Buena calidad":r.total<=10?"Mala calidad":"Muy mala calidad",risk:r.total<=5?"bajo":r.total<=10?"moderado":"alto",date:new Date().toISOString()})}
+          disabled={r.total===null} style={{padding:"10px 24px",borderRadius:8,border:"none",background:r.total!==null?BRAND:"#e0e0ee",color:"#fff",fontWeight:500,cursor:r.total!==null?"pointer":"not-allowed",fontSize:14}}>
+          Guardar resultado
+        </button>
+      </div>
+    );
+  }
+  const score=scale.questions.every((_,i)=>ans[i]!==undefined)?scale.questions.reduce((_,x,i)=>_+ans[i],0):null;
+  const interp=score!==null?scale.interpret(score):null;
+  return(
+    <div>
+      <button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}>← Volver</button>
+      <h2 style={{fontSize:17,fontWeight:500,marginBottom:4}}>{scale.name}</h2>
+      <p style={{fontSize:13,color:"#555577",marginBottom:"1.5rem"}}>{scale.desc}</p>
+      {scale.questions.map((q,i)=>(
+        <div key={i} style={{marginBottom:"1rem",padding:"0.875rem 1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+          <p style={{fontSize:13,fontWeight:500,marginBottom:8}}>{i+1}. {q}</p>
+          <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+            {scale.options.map((opt,j)=>(
+              <button key={j} onClick={()=>setAns({...ans,[i]:scale.optionValues[j]})}
+                style={{padding:"4px 10px",fontSize:12,borderRadius:20,border:ans[i]===scale.optionValues[j]?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:ans[i]===scale.optionValues[j]?BRAND_LIGHT:"#fff",color:ans[i]===scale.optionValues[j]?BRAND_MID:"#1a1a2e",cursor:"pointer"}}>
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+      {score!==null&&(
+        <div style={{margin:"1.5rem 0",padding:"1rem 1.25rem",borderRadius:10,border:`1.5px solid ${interp.color}`}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <span style={{fontSize:13,color:"#555577"}}>Puntaje total</span>
+            <span style={{fontSize:28,fontWeight:500,color:interp.color}}>{score} / {scale.max}</span>
+          </div>
+          <div style={{padding:"5px 12px",borderRadius:20,background:interp.color+"22",display:"inline-block",fontSize:13,color:interp.color,fontWeight:500,marginBottom:6}}>{interp.label}</div>
+          {interp.detail&&<p style={{fontSize:12,color:"#555577",margin:"6px 0 4px",lineHeight:1.6}}>{interp.detail}</p>}
+          <p style={{fontSize:11,color:"#999",margin:0}}>Ref: {scale.ref}</p>
+        </div>
+      )}
+      <button onClick={()=>score!==null&&onComplete({scaleId:scale.id,scaleName:scale.name,score,max:scale.max,label:interp.label,risk:interp.risk,date:new Date().toISOString()})}
+        disabled={score===null} style={{padding:"10px 24px",borderRadius:8,border:"none",background:score!==null?BRAND:"#e0e0ee",color:"#fff",fontWeight:500,cursor:score!==null?"pointer":"not-allowed",fontSize:14}}>
+        Guardar resultado
+      </button>
+    </div>
+  );
+}
+
+function TCCIPlan({patient,onBack}){
+  const le={};patient.evaluations?.forEach(e=>{le[e.scaleId]=e;});
+  const isi=le["isi"]?.score??14;const psqi=le["psqi"]?.score??8;
+  const sessions=buildSessions(isi,psqi);
+  const [done,setDone]=useState(patient.tcciDone||{});
+  const [exp,setExp]=useState(null);
+  const prog=sessions.filter(s=>done[s.n]).length;
+  return(
+    <div>
+      <button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}>← Volver al expediente</button>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"0.5rem",flexWrap:"wrap",gap:8}}>
+        <h2 style={{fontSize:17,fontWeight:500,margin:0}}>Plan TCC-I personalizado</h2>
+        <span style={{fontSize:12,padding:"4px 12px",borderRadius:20,background:BRAND_LIGHT,color:BRAND_MID}}>{sessions.length} sesiones · {sessions.length>=8?"Insomnio severo":sessions.length>=7?"Insomnio moderado":"Leve-moderado"}</span>
+      </div>
+      <p style={{fontSize:12,color:"#555577",marginBottom:"1rem"}}>Paquete óptimo basado en Furukawa et al. JAMA Psychiatry 2024 (cNMA, 241 ensayos, n=31,452).</p>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:"1.25rem"}}>
+        <div style={{flex:1,height:6,background:"#e0e0ee",borderRadius:3,overflow:"hidden"}}>
+          <div style={{height:"100%",width:`${(prog/sessions.length)*100}%`,background:BRAND,borderRadius:3}}></div>
+        </div>
+        <span style={{fontSize:12,color:"#555577",whiteSpace:"nowrap"}}>{prog}/{sessions.length} sesiones</span>
+      </div>
+      {sessions.map(s=>(
+        <div key={s.n} style={{marginBottom:8,borderRadius:10,border:`0.5px solid ${exp===s.n?BRAND:"#e0e0ee"}`,overflow:"hidden",opacity:done[s.n]?0.6:1}}>
+          <div style={{padding:"0.875rem 1rem",background:done[s.n]?"#f4f4f8":"#fff",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}} onClick={()=>setExp(exp===s.n?null:s.n)}>
+            <button onClick={e=>{e.stopPropagation();setDone({...done,[s.n]:!done[s.n]});}}
+              style={{width:22,height:22,borderRadius:"50%",border:`1.5px solid ${done[s.n]?BRAND:"#c8c8dd"}`,background:done[s.n]?BRAND:"transparent",cursor:"pointer",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              {done[s.n]&&<i className="ti ti-check" style={{fontSize:12,color:"#fff"}}></i>}
+            </button>
+            <div style={{flex:1}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                <span style={{fontSize:11,color:"#999"}}>Sesión {s.n}</span>
+                <span style={{fontSize:13,fontWeight:500}}>{s.title}</span>
+                <span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:SC[s.evidenceLevel]+"22",color:SC[s.evidenceLevel]}}>{SL[s.evidenceLevel]}</span>
+              </div>
+              <p style={{fontSize:11,color:"#555577",margin:"2px 0 0"}}>{s.focus}</p>
+            </div>
+            <i className={`ti ${exp===s.n?"ti-chevron-up":"ti-chevron-down"}`} style={{color:"#999",fontSize:15,flexShrink:0}}></i>
+          </div>
+          {exp===s.n&&(
+            <div style={{padding:"0 1rem 1rem",background:"#f4f4f8",borderTop:"0.5px solid #e0e0ee"}}>
+              <div style={{marginTop:"0.875rem",display:"grid",gap:10}}>
+                {s.evidence&&<div style={{padding:"0.625rem 0.875rem",background:SC[s.evidenceLevel]+"15",borderRadius:8,borderLeft:`3px solid ${SC[s.evidenceLevel]}`}}>
+                  <p style={{fontSize:11,fontWeight:500,color:SC[s.evidenceLevel],margin:"0 0 2px"}}>Evidencia</p>
+                  <p style={{fontSize:12,margin:0,color:"#555577"}}>{s.evidence}</p>
+                </div>}
+                {s.content?.map((c,ci)=>(
+                  <div key={ci} style={{padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}>
+                    <p style={{fontSize:13,fontWeight:500,margin:"0 0 8px",color:BRAND_MID}}>{c.heading}</p>
+                    <p style={{fontSize:12,color:"#555577",margin:0,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{c.body}</p>
+                  </div>
+                ))}
+                {s.tarea&&<div style={{padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}>
+                  <p style={{fontSize:12,fontWeight:500,margin:"0 0 4px"}}>Tarea intersesión</p>
+                  <p style={{fontSize:12,color:"#555577",margin:0,lineHeight:1.6}}>{s.tarea}</p>
+                </div>}
+                {s.nota&&<div style={{padding:"0.625rem 0.875rem",background:"#fff",borderRadius:8,borderLeft:"3px solid #e0e0ee"}}>
+                  <p style={{fontSize:11,color:"#999",margin:0,lineHeight:1.5,fontStyle:"italic"}}>{s.nota}</p>
+                </div>}
+                <button onClick={async(e)=>{e.stopPropagation();try{await generateSessionPDF(patient,s);}catch(err){alert("Error PDF: "+err.message);}}}
+                  style={{padding:"8px 16px",fontSize:12,borderRadius:8,border:"none",background:GREEN,color:"#fff",cursor:"pointer",fontWeight:500,display:"flex",alignItems:"center",gap:6,width:"fit-content"}}>
+                  <i className="ti ti-file-type-pdf" style={{fontSize:14}}></i> Plan semana {s.n} para el paciente
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PatientReport({patient,onBack,onStartTCCI,onScaleSelect}){
+  const [aiRep,setAiRep]=useState("");const [load,setLoad]=useState(false);
+  const le={};patient.evaluations?.forEach(e=>{le[e.scaleId]=e;});
+  async function gen(){
+    setLoad(true);
+    const sum=Object.values(le).map(e=>`${e.scaleName}: ${e.score}/${e.max} — ${e.label}`).join("\n");
+    try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"Especialista en medicina del sueño. Reporte clínico conciso en español. Formato: 1) Síntesis diagnóstica, 2) Correlación ICSD-3 TR/DSM-5-TR, 3) Estratificación de riesgo, 4) Abordaje terapéutico (TCC-I paquete óptimo Furukawa 2024 si aplica). Máximo 380 palabras.",messages:[{role:"user",content:`Paciente: ${patient.name}, ${patient.age||"?"}a.\n${sum}\nGenera reporte clínico.`}]})});
+    const d=await r.json();setAiRep(d.content?.[0]?.text||"Error.");}catch{setAiRep("Error de conexión.");}
+    setLoad(false);
+  }
+  const cd={};patient.evaluations?.forEach(e=>{if(!cd[e.scaleId])cd[e.scaleId]=[];cd[e.scaleId].push({date:new Date(e.date).toLocaleDateString("es-MX",{month:"short",day:"numeric"}),score:e.score,max:e.max});});
+  const hasIns=(le["isi"]?.score>=8)||(le["psqi"]?.score>=6);
+  return(
+    <div>
+      <button onClick={onBack} style={{background:"none",border:"none",color:"#555577",cursor:"pointer",fontSize:14,padding:"0 0 1rem",display:"flex",alignItems:"center",gap:6}}>← Pacientes</button>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:"1.5rem"}}>
+        <div style={{width:48,height:48,borderRadius:"50%",background:BRAND_LIGHT,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,fontWeight:500,color:BRAND_MID}}>{patient.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}</div>
+        <div><h2 style={{fontSize:18,fontWeight:500,margin:0}}>{patient.name}</h2><p style={{fontSize:13,color:"#555577",margin:0}}>{patient.age?`${patient.age} años · `:""}{patient.evaluations?.length||0} evaluaciones</p></div>
+      </div>
+      {Object.values(le).length>0&&(<div style={{marginBottom:"1.5rem"}}><h3 style={{fontSize:15,fontWeight:500,marginBottom:10}}>Últimos resultados</h3>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:8}}>
+          {Object.values(le).map(e=>{const ip=SCALES[e.scaleId]?.interpret(e.score);return(<div key={e.scaleId} style={{padding:"0.75rem 1rem",background:"#f4f4f8",borderRadius:10,borderLeft:`3px solid ${ip?.color||"#888"}`}}>
+            <p style={{fontSize:11,color:"#555577",margin:"0 0 3px"}}>{e.scaleName.split("(")[0].trim()}</p>
+            <p style={{fontSize:22,fontWeight:500,margin:"0 0 2px",color:ip?.color}}>{e.score}<span style={{fontSize:12,color:"#999"}}>/{e.max}</span></p>
+            <p style={{fontSize:11,margin:0,color:ip?.color}}>{e.label}</p>
+          </div>);})}
+        </div>
+      </div>)}
+      {Object.entries(cd).some(([,v])=>v.length>1)&&(<div style={{marginBottom:"1.5rem"}}><h3 style={{fontSize:15,fontWeight:500,marginBottom:10}}>Progreso en el tiempo</h3>
+        {Object.entries(cd).map(([sid,vals])=>vals.length>1&&(<div key={sid} style={{marginBottom:10,padding:"0.875rem 1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+          <p style={{fontSize:13,fontWeight:500,marginBottom:8}}>{SCALES[sid]?.name.split("(")[0].trim()}</p>
+          <div style={{display:"flex",alignItems:"flex-end",gap:6,height:64}}>
+            {vals.map((v,i)=>{const pct=v.score/v.max;const col=SCALES[sid]?.interpret(v.score)?.color||"#888";return(<div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,flex:1}}>
+              <span style={{fontSize:10,color:col,fontWeight:500}}>{v.score}</span>
+              <div style={{width:"100%",height:Math.max(8,pct*48),background:col,borderRadius:4,opacity:0.8}}></div>
+              <span style={{fontSize:9,color:"#999"}}>{v.date}</span>
+            </div>);})}
+          </div>
+        </div>))}
+      </div>)}
+      <div style={{marginBottom:"1.5rem",display:"flex",gap:8,flexWrap:"wrap"}}>
+        <button onClick={async()=>{try{await generatePatientReportPDF(patient,aiRep);}catch(e){alert("Error PDF: "+e.message);}}}
+          style={{padding:"9px 18px",fontSize:13,borderRadius:8,border:"none",background:GREEN,color:"#fff",cursor:"pointer",fontWeight:500,display:"flex",alignItems:"center",gap:6}}>
+          <i className="ti ti-file-type-pdf" style={{fontSize:15}}></i> Descargar reporte PDF
+        </button>
+      </div>
+      {hasIns&&(<div style={{marginBottom:"1.5rem",padding:"1rem 1.25rem",background:BRAND_LIGHT,borderRadius:10,border:`0.5px solid #AFA9EC`,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+        <div><p style={{fontSize:14,fontWeight:500,color:BRAND_MID,margin:"0 0 3px"}}>Plan TCC-I disponible</p><p style={{fontSize:12,color:BRAND,margin:0}}>Puntaje ISI/PSQI indica insomnio tratable con TCC-I.</p></div>
+        <button onClick={onStartTCCI} style={{padding:"8px 16px",fontSize:13,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer",fontWeight:500}}>Ver plan TCC-I</button>
+      </div>)}
+      <div style={{marginBottom:"1.5rem"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+          <h3 style={{fontSize:15,fontWeight:500,margin:0}}>Reporte clínico con IA</h3>
+          <button onClick={gen} disabled={load||Object.values(le).length===0} style={{padding:"6px 14px",fontSize:12,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",cursor:"pointer"}}>{load?"Generando...":"Generar reporte ↗"}</button>
+        </div>
+        {aiRep&&<div style={{padding:"1rem 1.25rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee",fontSize:13,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{aiRep}</div>}
+        {!aiRep&&Object.values(le).length===0&&<p style={{fontSize:13,color:"#999"}}>Completa al menos una escala para generar el reporte.</p>}
+      </div>
+      <div><h3 style={{fontSize:15,fontWeight:500,marginBottom:10}}>Aplicar escala</h3>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:8}}>
+          {Object.values(SCALES).map(s=>(<button key={s.id} onClick={()=>onScaleSelect(s)} style={{padding:"0.75rem 1rem",textAlign:"left",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee",cursor:"pointer",fontSize:13,fontWeight:500,color:"#1a1a2e"}}>
+            {s.name.split("(")[0].trim()}<span style={{display:"block",fontSize:11,color:"#999",fontWeight:400}}>{s.name.match(/\(([^)]+)\)/)?.[1]||""}</span>
+          </button>))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MAIN ──────────────────────────────────────────────────────────────────────
+function App(){
+  const [tab,setTab]=useState("patients");
+  const [patients,setPatients]=useState(loadP);
+  const [selPt,setSelPt]=useState(null);
+  const [activeScale,setActiveScale]=useState(null);
+  const [showNew,setShowNew]=useState(false);
+  const [newName,setNewName]=useState("");const [newAge,setNewAge]=useState("");
+  const [view,setView]=useState("list");
+  const [diagCat,setDiagCat]=useState("Todos");const [diagSearch,setDiagSearch]=useState("");
+  const [expDx,setExpDx]=useState(null);
+  const [glossSearch,setGlossSearch]=useState("");
+  const [fVals,setFVals]=useState({});const [fRes,setFRes]=useState({});
+
+  function addPt(){if(!newName.trim())return;const p={id:Date.now(),name:newName.trim(),age:newAge,evaluations:[],createdAt:new Date().toISOString()};const u=[...patients,p];setPatients(u);saveP(u);setNewName("");setNewAge("");setShowNew(false);}
+  function handleScaleDone(result){const u=patients.map(p=>{if(p.id!==selPt.id)return p;return{...p,evaluations:[...(p.evaluations||[]),result]};});setPatients(u);saveP(u);setSelPt(u.find(p=>p.id===selPt.id));setView("report");setActiveScale(null);}
+  const fDx=DX.filter(d=>(diagCat==="Todos"||d.cat===diagCat)&&(!diagSearch||d.name.toLowerCase().includes(diagSearch.toLowerCase())));
+  const fGlos=GLOS.filter(g=>!glossSearch||g.t.toLowerCase().includes(glossSearch.toLowerCase())||g.d.toLowerCase().includes(glossSearch.toLowerCase()));
+  function calcF(fid){const f=FORMULAS.find(x=>x.id===fid);const r=f.calc(fVals[fid]||{});setFRes({...fRes,[fid]:r});}
+
+  const TABS=[{id:"patients",label:"Pacientes",icon:"ti-users"},{id:"scales",label:"Escalas",icon:"ti-clipboard-list"},{id:"diagnostics",label:"Diagnósticos",icon:"ti-stethoscope"},{id:"tccd",label:"TCC-I",icon:"ti-brain"},{id:"formulas",label:"Fórmulas",icon:"ti-calculator"},{id:"glossary",label:"Glosario",icon:"ti-book"}];
+
+  return(
+    <div style={{fontFamily:"var(--font-sans)",color:"#1a1a2e",maxWidth:720,margin:"0 auto"}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,padding:"1rem 0 0.5rem",borderBottom:"0.5px solid #e0e0ee",marginBottom:"1rem"}}>
+        <div style={{width:36,height:36,borderRadius:10,background:BRAND,display:"flex",alignItems:"center",justifyContent:"center"}}><i className="ti ti-moon" style={{color:"#fff",fontSize:18}}></i></div>
+        <div><h1 style={{fontSize:20,fontWeight:500,margin:0,letterSpacing:-0.3}}>NapIQ</h1><p style={{fontSize:11,color:"#555577",margin:0}}>Plataforma clínico-diagnóstica · ICSD-3 TR · DSM-5-TR · Furukawa 2024</p></div>
+      </div>
+      <div style={{display:"flex",gap:0,marginBottom:"1.25rem",borderBottom:"0.5px solid #e0e0ee",overflowX:"auto"}}>
+        {TABS.map(t=>(<button key={t.id} onClick={()=>{setTab(t.id);setView("list");setActiveScale(null);}} style={{padding:"8px 11px",fontSize:12,border:"none",borderBottom:tab===t.id?`2px solid ${BRAND}`:"2px solid transparent",background:"none",color:tab===t.id?BRAND:"#555577",cursor:"pointer",fontWeight:tab===t.id?500:400,display:"flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}}><i className={`ti ${t.icon}`} style={{fontSize:14}}></i>{t.label}</button>))}
+      </div>
+
+      {tab==="patients"&&view==="list"&&(<div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
+          <h2 style={{fontSize:16,fontWeight:500,margin:0}}>Pacientes</h2>
+          <button onClick={()=>setShowNew(true)} style={{padding:"7px 14px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",cursor:"pointer",display:"flex",alignItems:"center",gap:5}}><i className="ti ti-plus" style={{fontSize:14}}></i>Nuevo paciente</button>
+        </div>
+        {showNew&&(<div style={{padding:"1rem",background:"#f4f4f8",borderRadius:10,border:"0.5px solid #e0e0ee",marginBottom:"1rem"}}>
+          <p style={{fontSize:14,fontWeight:500,marginBottom:10}}>Nuevo paciente</p>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            <input value={newName} onChange={e=>setNewName(e.target.value)} placeholder="Nombre completo" style={{flex:2,minWidth:160,padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e"}} onKeyDown={e=>e.key==="Enter"&&addPt()}/>
+            <input value={newAge} onChange={e=>setNewAge(e.target.value)} placeholder="Edad" type="number" style={{flex:1,minWidth:70,padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e"}}/>
+            <button onClick={addPt} style={{padding:"7px 14px",fontSize:13,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer"}}>Agregar</button>
+            <button onClick={()=>setShowNew(false)} style={{padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",cursor:"pointer"}}>Cancelar</button>
+          </div>
+        </div>)}
+        {patients.length===0&&<p style={{fontSize:14,color:"#999",textAlign:"center",padding:"2.5rem 0"}}>Sin pacientes registrados. Agrega el primero.</p>}
+        {patients.map(pt=>(<div key={pt.id} onClick={()=>{setSelPt(pt);setView("report");}} style={{padding:"0.875rem 1rem",background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee",marginBottom:8,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:38,height:38,borderRadius:"50%",background:BRAND_LIGHT,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:500,color:BRAND_MID}}>{pt.name.split(" ").map(n=>n[0]).join("").slice(0,2).toUpperCase()}</div>
+            <div><p style={{fontSize:14,fontWeight:500,margin:0}}>{pt.name}</p><p style={{fontSize:12,color:"#555577",margin:0}}>{pt.age?`${pt.age} años · `:""}{pt.evaluations?.length||0} evaluaciones</p></div>
+          </div>
+          <i className="ti ti-chevron-right" style={{color:"#999",fontSize:18}}></i>
+        </div>))}
+      </div>)}
+      {tab==="patients"&&view==="report"&&selPt&&<PatientReport patient={selPt} onBack={()=>setView("list")} onStartTCCI={()=>setView("tcci")} onScaleSelect={s=>{setActiveScale(s);setView("scale");}}/>}
+      {tab==="patients"&&view==="tcci"&&selPt&&<TCCIPlan patient={selPt} onBack={()=>setView("report")}/>}
+      {tab==="patients"&&view==="scale"&&activeScale&&<ScaleForm scale={activeScale} onComplete={handleScaleDone} onBack={()=>{setView("report");setActiveScale(null);}}/>}
+
+      {tab==="scales"&&(<div>{!activeScale?(<><h2 style={{fontSize:16,fontWeight:500,marginBottom:"1rem"}}>Escalas validadas</h2>
+        {Object.values(SCALES).map(s=>(<div key={s.id} style={{padding:"0.875rem 1rem",background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee",marginBottom:8,cursor:"pointer"}} onClick={()=>setActiveScale(s)}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div><p style={{fontSize:14,fontWeight:500,margin:"0 0 3px"}}>{s.name}</p><p style={{fontSize:12,color:"#555577",margin:0}}>{s.desc}</p></div>
+            <i className="ti ti-chevron-right" style={{color:"#999",fontSize:18,marginLeft:8}}></i>
+          </div>
+        </div>))}</>):(<ScaleForm scale={activeScale} onComplete={()=>setActiveScale(null)} onBack={()=>setActiveScale(null)}/>)}
+      </div>)}
+
+      {tab==="diagnostics"&&(<div>
+        <h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}>Diagnósticos — ICSD-3 TR · DSM-5-TR</h2>
+        <p style={{fontSize:13,color:"#555577",marginBottom:"1rem"}}>{DX.length} patologías con criterios, escalas y nivel de evidencia.</p>
+        <input value={diagSearch} onChange={e=>setDiagSearch(e.target.value)} placeholder="Buscar patología..." style={{width:"100%",padding:"8px 12px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e",marginBottom:"0.75rem"}}/>
+        <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:"1rem"}}>{DIAG_CATS.map(c=>(<button key={c} onClick={()=>setDiagCat(c)} style={{padding:"4px 12px",fontSize:12,borderRadius:20,border:diagCat===c?`1.5px solid ${BRAND}`:"0.5px solid #c8c8dd",background:diagCat===c?BRAND_LIGHT:"#fff",color:diagCat===c?BRAND_MID:"#555577",cursor:"pointer",fontWeight:diagCat===c?500:400}}>{c}</button>))}</div>
+        {fDx.map(d=>(<div key={d.id} style={{marginBottom:8,borderRadius:10,border:"0.5px solid #e0e0ee",overflow:"hidden"}}>
+          <div onClick={()=>setExpDx(expDx===d.id?null:d.id)} style={{padding:"0.875rem 1rem",background:"#fff",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div style={{flex:1}}>
+              <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                <p style={{fontSize:14,fontWeight:500,margin:0}}>{d.name}</p>
+                <span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:BRAND_LIGHT,color:BRAND_MID}}>{d.cat}</span>
+                <span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:PC[d.evidence]+"22",color:PC[d.evidence]}}>Evidencia {d.evidence}</span>
+              </div>
+              <p style={{fontSize:12,color:"#555577",margin:"3px 0 0"}}>{d.def}</p>
+            </div>
+            <i className={`ti ${expDx===d.id?"ti-chevron-up":"ti-chevron-down"}`} style={{color:"#999",fontSize:16,marginLeft:8,flexShrink:0}}></i>
+          </div>
+          {expDx===d.id&&(<div style={{padding:"0 1rem 1rem",background:"#f4f4f8",borderTop:"0.5px solid #e0e0ee"}}>
+            <div style={{marginTop:"0.875rem",display:"grid",gap:10}}>
+              <div style={{padding:"0.75rem",background:"#fff",borderRadius:8,borderLeft:`3px solid ${BRAND}`}}><p style={{fontSize:12,fontWeight:500,color:BRAND_MID,margin:"0 0 4px"}}>Criterios ICSD-3 TR</p><p style={{fontSize:13,margin:0,lineHeight:1.6}}>{d.icsd}</p></div>
+              {d.dsm&&<div style={{padding:"0.75rem",background:"#fff",borderRadius:8,borderLeft:`3px solid ${GREEN}`}}><p style={{fontSize:12,fontWeight:500,color:"#0F6E56",margin:"0 0 4px"}}>DSM-5-TR</p><p style={{fontSize:13,margin:0,lineHeight:1.6}}>{d.dsm}</p></div>}
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                <div style={{flex:1,minWidth:140,padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}><p style={{fontSize:12,fontWeight:500,margin:"0 0 6px",color:"#555577"}}>Escalas</p><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{d.scales.map(s=><span key={s} style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:BRAND_LIGHT,color:BRAND_MID}}>{s}</span>)}</div></div>
+                <div style={{flex:1,minWidth:140,padding:"0.75rem",background:"#fff",borderRadius:8,border:"0.5px solid #e0e0ee"}}><p style={{fontSize:12,fontWeight:500,margin:"0 0 6px",color:"#555577"}}>Señales de alarma</p>{d.alarms.map((a,i)=><p key={i} style={{fontSize:12,margin:"2px 0",color:RED}}>• {a}</p>)}</div>
+              </div>
+              <p style={{fontSize:11,color:"#999",margin:0}}>Ref: {d.ref}</p>
+            </div>
+          </div>)}
+        </div>))}
+      </div>)}
+
+      {tab==="tccd"&&(<div>
+        <h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}>TCC-I — Evidencia y componentes</h2>
+        <div style={{padding:"0.875rem 1rem",background:BRAND_LIGHT,borderRadius:10,marginBottom:"1.25rem",border:`0.5px solid #AFA9EC`}}>
+          <p style={{fontSize:13,fontWeight:500,color:BRAND_MID,margin:"0 0 4px"}}>Paquete óptimo — Furukawa et al. JAMA Psychiatry 2024</p>
+          <p style={{fontSize:12,color:BRAND,margin:0}}>cNMA · 241 ensayos · 31,452 participantes · Reestructuración cognitiva (1.68) · Tercera ola (1.49) · Restricción del sueño (1.49) · Control de estímulos (1.43) · Presencial (1.83)</p>
+        </div>
+        {[{title:"Reestructuración cognitiva",ior:"1.68",col:BRAND,badge:"Mayor beneficio en remisión",desc:"Identifica y desafía creencias disfuncionales. Mejora calidad subjetiva y remisión a largo plazo."},
+          {title:"Restricción del sueño",ior:"1.49",col:BRAND,badge:"Mejora eficiencia y WASO",desc:"Ventana = TTS promedio + 30 min. Ajuste semanal por ES. Reduce WASO (iMD −7 min)."},
+          {title:"Tercera ola (Mindfulness/ACT)",ior:"1.49",col:BRAND,badge:"Aceptación",desc:"Mecanismo de aceptación, no de control. Atenúa la lucha contra el insomnio."},
+          {title:"Control de estímulos",ior:"1.43",col:BRAND,badge:"Mejora latencia y eficiencia",desc:"5 reglas de Bootzin + regla de los 20 min. Mejora latencia (iMD −7 min)."},
+          {title:"Formato presencial",ior:"1.83",col:GREEN,badge:"Formato óptimo",desc:"Formato más eficaz. Autoayuda con apoyo humano no fue significativamente inferior."},
+          {title:"Higiene del sueño (aislada)",ior:"1.01",col:GRAY,badge:"Sin beneficio incremental",desc:"Sin beneficio como componente aislado. Contexto educativo únicamente."},
+          {title:"Relajación",ior:"0.81",col:RED,badge:"Potencialmente contraproducente",desc:"Puede contrarrestar restricción del sueño y control de estímulos. Excluida del paquete óptimo."},
+        ].map((c,i)=>(<div key={i} style={{marginBottom:10,padding:"1rem",background:"#f4f4f8",borderRadius:10}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6,marginBottom:6}}>
+            <p style={{fontSize:14,fontWeight:500,margin:0}}>{c.title}</p>
+            <div style={{display:"flex",gap:6}}><span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:c.col+"22",color:c.col}}>iOR {c.ior}</span><span style={{fontSize:11,padding:"2px 8px",borderRadius:20,background:c.col+"15",color:c.col}}>{c.badge}</span></div>
+          </div>
+          <p style={{fontSize:13,color:"#555577",margin:0,lineHeight:1.6}}>{c.desc}</p>
+        </div>))}
+        <div style={{marginTop:"1rem",padding:"0.875rem 1rem",background:BRAND_LIGHT,borderRadius:10,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+          <p style={{fontSize:13,color:BRAND_MID,margin:0}}>El plan TCC-I sesión a sesión se genera en el expediente de cada paciente.</p>
+          <button onClick={()=>setTab("patients")} style={{padding:"7px 14px",fontSize:12,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer"}}>Ir a pacientes ↗</button>
+        </div>
+      </div>)}
+
+      {tab==="formulas"&&(<div>
+        <h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}>Calculadoras clínicas</h2>
+        <p style={{fontSize:13,color:"#555577",marginBottom:"1.25rem"}}>Fórmulas para el cálculo e interpretación clínica de parámetros del sueño.</p>
+        {FORMULAS.map(f=>{const vals=fVals[f.id]||{};const res=fRes[f.id];return(<div key={f.id} style={{marginBottom:14,padding:"1rem 1.25rem",background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee"}}>
+          <p style={{fontSize:14,fontWeight:500,margin:"0 0 4px"}}>{f.name}</p>
+          <p style={{fontSize:12,color:"#555577",margin:"0 0 12px",lineHeight:1.5}}>{f.desc}</p>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:8,marginBottom:10}}>
+            {f.fields.map(field=>(<div key={field.id}>
+              <p style={{fontSize:11,color:"#555577",margin:"0 0 4px"}}>{field.label}</p>
+              <input placeholder={field.ph} value={vals[field.id]||""} onChange={e=>setFVals({...fVals,[f.id]:{...vals,[field.id]:e.target.value}})}
+                style={{width:"100%",padding:"7px 10px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#f4f4f8",color:"#1a1a2e"}}/>
+            </div>))}
+          </div>
+          <button onClick={()=>calcF(f.id)} style={{padding:"7px 18px",fontSize:13,borderRadius:8,border:"none",background:BRAND,color:"#fff",cursor:"pointer",marginBottom:res?"12px":0}}>Calcular</button>
+          {res&&(<div style={{padding:"1rem",background:"#f4f4f8",borderRadius:8,border:`1.5px solid ${BRAND}`}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:6,marginBottom:8}}>
+              <span style={{fontSize:26,fontWeight:500,color:BRAND}}>{res.value}</span>
+              {res.unit&&<span style={{fontSize:13,color:"#555577"}}>{res.unit}</span>}
+            </div>
+            <p style={{fontSize:12,color:"#555577",margin:0,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{res.interp}</p>
+          </div>)}
+        </div>);})}
+      </div>)}
+
+      {tab==="glossary"&&(<div>
+        <h2 style={{fontSize:16,fontWeight:500,marginBottom:"0.5rem"}}>Glosario de medicina del sueño</h2>
+        <p style={{fontSize:13,color:"#555577",marginBottom:"1rem"}}>{GLOS.length} términos clínicos basados en ICSD-3 TR, AASM y literatura indexada.</p>
+        <input value={glossSearch} onChange={e=>setGlossSearch(e.target.value)} placeholder="Buscar término..." style={{width:"100%",padding:"8px 12px",fontSize:13,borderRadius:8,border:"0.5px solid #c8c8dd",background:"#fff",color:"#1a1a2e",marginBottom:"1rem"}}/>
+        {fGlos.map((g,i)=>(<div key={i} style={{padding:"0.75rem 1rem",marginBottom:6,background:"#fff",borderRadius:10,border:"0.5px solid #e0e0ee",display:"flex",gap:12,alignItems:"flex-start"}}>
+          <span style={{fontSize:13,fontWeight:500,color:BRAND,minWidth:90,flexShrink:0}}>{g.t}</span>
+          <span style={{fontSize:13,color:"#555577",lineHeight:1.6}}>{g.d}</span>
+        </div>))}
+      </div>)}
+    </div>
+  );
+}
+
+function mountApp(){ReactDOM.createRoot(document.getElementById("app-root")).render(React.createElement(App));}
+</script>
+</body>
+</html>
